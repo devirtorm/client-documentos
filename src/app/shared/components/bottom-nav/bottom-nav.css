@@ -1,0 +1,36 @@
+:host {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.tab-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    flex: 1;
+    height: 3.5rem;
+    border-radius: 0;
+    color: var(--muted-foreground);
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease;
+}
+
+.tab-item:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+.tab-label {
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+/* Active state */
+.active-tab {
+    color: var(--primary) !important;
+}

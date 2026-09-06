@@ -1,0 +1,70 @@
+<li class="px-3 py-1.5" [attr.id]="'cliente-' + cliente().clave">
+    <a [routerLink]="['/articulos']" [queryParams]="{ cliente: cliente().clave }"
+        class="block rounded-xl border border-border/70 bg-card transition-all duration-200 overflow-hidden hover:border-primary/30 hover:shadow-sm hover:shadow-primary/10 no-underline group cursor-pointer">
+
+        <!-- Contenido principal -->
+        <div class="flex items-start gap-3 p-3.5">
+            <!-- Info -->
+            <div class="flex-1 min-w-0 pt-0.5">
+                <p class="text-[13px] font-semibold text-foreground leading-snug line-clamp-1">
+                    {{ cliente()!.nombre }}
+                </p>
+                <div class="flex items-center gap-1.5 mt-1">
+                    <span
+                        class="inline-flex items-center text-[10px] font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
+                        {{ cliente()!.clave }}
+                    </span>
+                    @if (cliente()!.ciudad) {
+                    <span
+                        class="inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="shrink-0">
+                            <path
+                                d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+                            <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        {{ cliente()!.ciudad }}
+                    </span>
+                    }
+                    @if (cliente()!.telefono) {
+                    <span
+                        class="inline-flex items-center gap-1 text-[10px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="shrink-0">
+                            <path
+                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                        </svg>
+                        {{ cliente()!.telefono }}
+                    </span>
+                    }
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="shrink-0 flex items-center gap-0.5 pt-0.5">
+                @if (!cliente().esClienteBase) {
+                <button hlmBtn variant="ghost" size="sm"
+                    class="h-8 w-8 rounded-xl p-0 text-muted-foreground hover:text-foreground transition-all duration-200"
+                    aria-label="Editar cliente" (click)="$event.preventDefault(); $event.stopPropagation(); onEdit()">
+                    <ng-icon name="lucidePencil"></ng-icon>
+                </button>
+                <button hlmBtn variant="ghost" size="sm"
+                    class="h-8 w-8 rounded-xl p-0 text-muted-foreground hover:text-red-500 transition-all duration-200"
+                    aria-label="Eliminar cliente"
+                    (click)="$event.preventDefault(); $event.stopPropagation(); onDelete()">
+                    <ng-icon name="lucideTrash"></ng-icon>
+                </button>
+                }
+
+                <!-- Chevron -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200">
+                    <path d="m9 18 6-6-6-6" />
+                </svg>
+            </div>
+        </div>
+    </a>
+</li>

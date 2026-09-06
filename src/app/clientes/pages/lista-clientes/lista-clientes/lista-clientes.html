@@ -1,0 +1,140 @@
+<!-- Header fijo -->
+<app-header title="Clientes">
+    <div subtitle-content class="text-[11px] text-muted-foreground mt-0.5">
+        {{ clientesFiltrados().length }} cliente{{ clientesFiltrados().length !== 1 ? 's' : '' }}
+        @if (zonaSeleccionada() !== 'todas') {
+        <span class="text-primary font-semibold ml-1">
+            · {{ zonaSeleccionada() }}
+        </span>
+        }
+    </div>
+
+    <!-- Título + Botón agregar -->
+    <ng-container right-action>
+        <a routerLink="/clientes/nuevo" hlmBtn variant="default" size="sm"
+            class="rounded-lg text-xs gap-1.5 no-underline mr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14" />
+                <path d="M12 5v14" />
+            </svg>
+            Agregar
+        </a>
+    </ng-container>
+
+    <!-- Toolbar: búsqueda + filtros -->
+    <div bottom-content>
+        <div class="px-4 pb-2.5 flex items-center gap-2">
+            <!-- Búsqueda -->
+            <div class="relative flex-1">
+                <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                    xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input hlmInput type="text" placeholder="Buscar por nombre o clave..."
+                    class="w-full pl-8 pr-3 h-9 text-sm rounded-xl" [value]="searchQuery()" (input)="onSearch($event)"
+                    id="search-clientes" />
+            </div>
+
+            <!-- Botón filtros toggle -->
+            <button hlmBtn variant="outline" size="icon" class="shrink-0 h-9 w-9 rounded-xl" (click)="toggleFiltros()"
+                [class.bg-primary]="mostrarFiltros()" [class.text-primary-foreground]="mostrarFiltros()"
+                aria-label="Filtros">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="21" x2="14" y1="4" y2="4" />
+                    <line x1="10" x2="3" y1="4" y2="4" />
+                    <line x1="21" x2="12" y1="12" y2="12" />
+                    <line x1="8" x2="3" y1="12" y2="12" />
+                    <line x1="21" x2="16" y1="20" y2="20" />
+                    <line x1="12" x2="3" y1="20" y2="20" />
+                    <line x1="14" x2="14" y1="2" y2="6" />
+                    <line x1="8" x2="8" y1="10" y2="14" />
+                    <line x1="16" x2="16" y1="18" y2="22" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Panel de filtros expandible -->
+        @if (mostrarFiltros()) {
+        <div class="px-4 pb-3 border-t border-border/50 pt-2 animate-in slide-in-from-top-1 duration-200">
+            <!-- Ordenar por -->
+            <div class="mb-2">
+                <span class="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Ordenar por</span>
+                <div class="flex gap-1.5 mt-1.5">
+                    <button hlmBtn [variant]="ordenSeleccionado() === 'nombre' ? 'default' : 'outline'" size="sm"
+                        class="rounded-full text-xs h-7 px-3" (click)="setOrden('nombre')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mr-1">
+                            <path d="m3 16 4 4 4-4" />
+                            <path d="M7 20V4" />
+                            <path d="M11 4h4" />
+                            <path d="M11 8h7" />
+                            <path d="M11 12h10" />
+                        </svg>
+                        Nombre
+                    </button>
+                    <button hlmBtn [variant]="ordenSeleccionado() === 'codigo' ? 'default' : 'outline'" size="sm"
+                        class="rounded-full text-xs h-7 px-3" (click)="setOrden('codigo')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mr-1">
+                            <path d="m3 8 4-4 4 4" />
+                            <path d="M7 4v16" />
+                            <rect x="15" y="4" width="4" height="6" ry="2" />
+                            <path d="M17 20v-6h-2" />
+                            <path d="M15 20h4" />
+                        </svg>
+                        Código
+                    </button>
+                    <button hlmBtn [variant]="ordenSeleccionado() === 'zona' ? 'default' : 'outline'" size="sm"
+                        class="rounded-full text-xs h-7 px-3" (click)="setOrden('zona')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mr-1">
+                            <path
+                                d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+                            <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        Zona
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtrar por zona -->
+            <div>
+                <span class="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Zona</span>
+                <div class="flex gap-1.5 mt-1.5 overflow-x-auto pb-1 scrollbar-hide -mr-4 pr-4">
+                    @for (zona of zonas(); track zona) {
+                    <button hlmBtn [variant]="zonaSeleccionada() === zona.toLowerCase() ? 'default' : 'outline'"
+                        size="sm" class="rounded-full text-xs h-7 px-3 shrink-0" (click)="setZona(zona)">
+                        {{ zona }}
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</app-header>
+
+<!-- Lista de clientes -->
+<main class="pb-6 pt-2">
+    <ul class="flex flex-col">
+        @for (cliente of clientesFiltrados(); track cliente.clave) {
+        <app-item-cliente [cliente]="cliente" (delete)="eliminarCliente($event)" />
+        } @empty {
+        <li class="flex flex-col items-center justify-center py-20 text-center px-2">
+            <div class="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center mb-4">
+                <ng-icon name="lucideUserSearch" size="28" class="text-muted-foreground" />
+            </div>
+            <p class="text-sm font-semibold text-foreground mb-1">Sin resultados</p>
+            <p class="text-xs text-muted-foreground max-w-[240px]">No se encontraron clientes con ese criterio.
+                Intenta con otro término.</p>
+        </li>
+        }
+    </ul>
+</main>

@@ -1,0 +1,18 @@
+<!-- Header -->
+<app-sincronizacion-header [count]="items().length"></app-sincronizacion-header>
+
+<!-- Contenido -->
+<main class="pb-32">
+    @if (isLoading()) {
+    <app-sincronizacion-skeleton></app-sincronizacion-skeleton>
+    } @else if (isEmpty()) {
+    <app-sincronizacion-empty-state></app-sincronizacion-empty-state>
+    } @else {
+    <!-- Lista de documentos -->
+    <div class="flex flex-col gap-3 px-4 pt-4">
+        @for (item of items(); track item.id) {
+        <app-sincronizacion-item [item]="item" (descartar)="onDescartarItem($event.id!)"></app-sincronizacion-item>
+        }
+    </div>
+    }
+</main>

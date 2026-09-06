@@ -1,0 +1,40 @@
+<hlm-card class="w-full max-w-sm shadow-lg">
+    <hlm-card-header>
+        <h3 hlmCardTitle class="text-xl">Registrar Dispositivo</h3>
+        <p hlmCardDescription>Ingrese los datos del dispositivo para registrarlo en el sistema</p>
+    </hlm-card-header>
+
+    <div hlmCardContent>
+        <form [formGroup]="form">
+            <div class="flex flex-col gap-4">
+                <div class="grid gap-2">
+                    <label hlmLabel for="nombre">Nombre del Dispositivo</label>
+                    <input formControlName="nombre" type="text" id="nombre" placeholder="Ej. PC-Sala-Direccion" required
+                        hlmInput />
+                </div>
+
+                <div class="grid gap-2">
+                    <label hlmLabel for="password">Clave de Activación</label>
+                    <input id="password" required hlmInput class="w-full pr-10" formControlName="password" />
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <hlm-card-footer class="flex-col gap-3 pt-2">
+        <button hlmBtn type="submit" class="w-full">Registrar</button>
+
+        <div class="relative w-full my-1">
+            <div class="absolute inset-0 flex items-center">
+                <span class="w-full border-t border-border"></span>
+            </div>
+            <div class="relative flex justify-center text-xs uppercase">
+                <span class="bg-card px-2 text-muted-foreground">o</span>
+            </div>
+        </div>
+
+        <button hlmBtn variant="outline" type="button" class="w-full" routerLink="/auth/login">
+            ¿Ya tienes una cuenta? Inicia Sesión
+        </button>
+    </hlm-card-footer>
+</hlm-card>

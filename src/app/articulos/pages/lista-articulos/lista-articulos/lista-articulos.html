@@ -1,0 +1,177 @@
+<!-- Header fijo -->
+<app-header title="Artículos">
+    <div subtitle-content class="text-[11px] text-muted-foreground mt-0.5">
+        {{ articulos().length }} resultado{{ articulos().length !== 1 ? 's' : '' }}
+        @if (totalItemsCarrito() > 0) {
+        <span class="text-primary font-semibold ml-1">
+            · {{ totalItemsCarrito() }} en carrito
+        </span>
+        }
+    </div>
+
+    <!-- Toolbar: búsqueda + filtros -->
+    <div bottom-content>
+        <div class="px-4 pb-2.5 flex items-center gap-2">
+            <!-- Búsqueda -->
+            <div class="relative flex-1">
+                <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                    xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input hlmInput type="text" placeholder="Buscar por nombre o clave..."
+                    class="w-full pl-8 pr-3 h-9 text-sm rounded-xl" [value]="searchQuery()" (input)="onSearch($event)"
+                    id="search-articulos" />
+            </div>
+
+            <!-- Botón filtros toggle -->
+            <button hlmBtn variant="outline" size="icon" class="shrink-0 h-9 w-9 rounded-xl" (click)="toggleFiltros()"
+                [class.bg-primary]="mostrarFiltros()" [class.text-primary-foreground]="mostrarFiltros()"
+                aria-label="Filtros">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="21" x2="14" y1="4" y2="4" />
+                    <line x1="10" x2="3" y1="4" y2="4" />
+                    <line x1="21" x2="12" y1="12" y2="12" />
+                    <line x1="8" x2="3" y1="12" y2="12" />
+                    <line x1="21" x2="16" y1="20" y2="20" />
+                    <line x1="12" x2="3" y1="20" y2="20" />
+                    <line x1="14" x2="14" y1="2" y2="6" />
+                    <line x1="8" x2="8" y1="10" y2="14" />
+                    <line x1="16" x2="16" y1="18" y2="22" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Panel de filtros expandible -->
+        @if (mostrarFiltros()) {
+        <div class="px-4 pb-3 border-t border-border/50 pt-2 animate-in slide-in-from-top-1 duration-200">
+            <!-- Ordenar por -->
+            <div>
+                <span class="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Ordenar por</span>
+                <div class="flex gap-1.5 mt-1.5">
+                    <button hlmBtn [variant]="ordenSeleccionado() === 'descripcion' ? 'default' : 'outline'" size="sm"
+                        class="rounded-full text-xs h-7 px-3" (click)="setOrden('descripcion')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mr-1">
+                            <path d="m3 16 4 4 4-4" />
+                            <path d="M7 20V4" />
+                            <path d="M11 4h4" />
+                            <path d="M11 8h7" />
+                            <path d="M11 12h10" />
+                        </svg>
+                        Descripción
+                    </button>
+                    <button hlmBtn [variant]="ordenSeleccionado() === 'codigo' ? 'default' : 'outline'" size="sm"
+                        class="rounded-full text-xs h-7 px-3" (click)="setOrden('codigo')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mr-1">
+                            <path d="m3 8 4-4 4 4" />
+                            <path d="M7 4v16" />
+                            <rect x="15" y="4" width="4" height="6" ry="2" />
+                            <path d="M17 20v-6h-2" />
+                            <path d="M15 20h4" />
+                        </svg>
+                        Código
+                    </button>
+                    <button hlmBtn [variant]="ordenSeleccionado() === 'precio' ? 'default' : 'outline'" size="sm"
+                        class="rounded-full text-xs h-7 px-3" (click)="setOrden('precio')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="mr-1">
+                            <line x1="12" x2="12" y1="2" y2="22" />
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                        Precio
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</app-header>
+
+<!-- Lista de artículos -->
+<main class="pb-24 pt-2">
+    <!-- Skeleton loading -->
+    @if (isLoading()) {
+    <ul class="flex flex-col">
+        @for (i of [1,2,3,4,5,6]; track i) {
+        <li class="flex items-center gap-3 px-4 py-3 border-b border-border/40">
+            <div class="w-10 h-10 rounded-xl bg-muted animate-pulse shrink-0"></div>
+            <div class="flex-1 flex flex-col gap-1.5">
+                <div class="h-3.5 rounded-full bg-muted animate-pulse w-3/4"></div>
+                <div class="h-3 rounded-full bg-muted animate-pulse w-1/2"></div>
+            </div>
+            <div class="h-8 w-16 rounded-xl bg-muted animate-pulse shrink-0"></div>
+        </li>
+        }
+    </ul>
+    } @else {
+    <ul class="flex flex-col">
+        @for (articulo of articulos(); track articulo.clave) {
+        <app-item-articulo [articulo]="articulo" [cantidadInicial]="getCantidad(articulo.clave)"
+            (cantidadChange)="onCantidadChange($event)" />
+        } @empty {
+        <li class="flex flex-col items-center justify-center py-20 text-center px-6">
+            <div class="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center mb-4">
+                <ng-icon name="lucidePackageSearch" size="28" class="text-muted-foreground" />
+            </div>
+            <p class="text-sm font-semibold text-foreground mb-1">Sin resultados</p>
+            <p class="text-xs text-muted-foreground max-w-[240px]">No se encontraron artículos con ese criterio.
+                Intenta con otro término.</p>
+        </li>
+        }
+        <!-- Load more -->
+        @if (hasMoreArticulos()) {
+        <div class="load-more-container">
+            <button hlmBtn variant="outline" size="sm" class="rounded-lg text-xs gap-1.5" (click)="loadMoreArticulos()"
+                [disabled]="isLoadingMore()">
+                @if (isLoadingMore()) {
+                <ng-icon name="lucideLoader2" size="14" class="loading-spinner" />
+                Cargando...
+                } @else {
+                <ng-icon name="lucideChevronDown" size="14" />
+                Cargar más
+                }
+            </button>
+        </div>
+        }
+    </ul>
+    }
+</main>
+
+<!-- Botón flotante de carrito -->
+@if (totalItemsCarrito() > 0) {
+<div class="fixed bottom-20 left-0 right-0 z-40 px-4 animate-in slide-in-from-bottom-4 duration-300">
+    <button hlmBtn variant="default"
+        class="w-full h-14 rounded-2xl shadow-2xl shadow-primary/25 flex items-center justify-between px-5 gap-3"
+        id="btn-abrir-carrito" (click)="verCarrito()">
+
+        <!-- Icono carrito + badge -->
+        <div class="flex items-center gap-3">
+            <div class="relative">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="8" cy="21" r="1" />
+                    <circle cx="19" cy="21" r="1" />
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                </svg>
+                <span
+                    class="absolute -top-2 -right-2.5 bg-primary-foreground text-primary text-[10px] font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
+                    {{ totalItemsCarrito() }}
+                </span>
+            </div>
+            <span class="text-sm font-semibold">Ver pedido</span>
+        </div>
+
+        <!-- Total -->
+        <span class="text-sm font-bold tabular-nums">
+            {{ totalPrecioCarrito() | currency:'$' }}
+        </span>
+    </button>
+</div>
+}

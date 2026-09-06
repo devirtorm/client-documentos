@@ -1,0 +1,300 @@
+{
+  "version": "6.0",
+  "nxVersion": "23.1.1",
+  "pathMappings": {
+    "@spartan-ng/helm/utils": [
+      "./libs/ui/utils/src/index.ts"
+    ],
+    "@spartan-ng/helm/button": [
+      "./libs/ui/button/src/index.ts"
+    ],
+    "@spartan-ng/helm/card": [
+      "./libs/ui/card/src/index.ts"
+    ],
+    "@spartan-ng/helm/input": [
+      "./libs/ui/input/src/index.ts"
+    ],
+    "@spartan-ng/helm/label": [
+      "./libs/ui/label/src/index.ts"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {},
+    "nonProjectFiles": [
+      {
+        "file": ".editorconfig",
+        "hash": "4165385352547808172"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "2385463205013933425"
+      },
+      {
+        "file": ".postcssrc.json",
+        "hash": "3238241118719959164"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "11411277661116404690"
+      },
+      {
+        "file": ".vscode/extensions.json",
+        "hash": "5331566439708925252"
+      },
+      {
+        "file": ".vscode/launch.json",
+        "hash": "17038929134016848735"
+      },
+      {
+        "file": ".vscode/mcp.json",
+        "hash": "18312290508764663119"
+      },
+      {
+        "file": ".vscode/tasks.json",
+        "hash": "1370608409982315224"
+      },
+      {
+        "file": "README.md",
+        "hash": "5439691082405240644"
+      },
+      {
+        "file": "angular.json",
+        "hash": "12822765874359829668"
+      },
+      {
+        "file": "components.json",
+        "hash": "1782399058892246833"
+      },
+      {
+        "file": "libs/ui/button/src/index.ts",
+        "hash": "5168917203269790378"
+      },
+      {
+        "file": "libs/ui/button/src/lib/hlm-button.token.ts",
+        "hash": "12913095847118528801"
+      },
+      {
+        "file": "libs/ui/button/src/lib/hlm-button.ts",
+        "hash": "5245430795567845219"
+      },
+      {
+        "file": "libs/ui/card/src/index.ts",
+        "hash": "4802100430641801892"
+      },
+      {
+        "file": "libs/ui/card/src/lib/hlm-card-action.ts",
+        "hash": "1349668912576127203"
+      },
+      {
+        "file": "libs/ui/card/src/lib/hlm-card-content.ts",
+        "hash": "1316310012403547216"
+      },
+      {
+        "file": "libs/ui/card/src/lib/hlm-card-description.ts",
+        "hash": "3476899060928045965"
+      },
+      {
+        "file": "libs/ui/card/src/lib/hlm-card-footer.ts",
+        "hash": "17023977997443537396"
+      },
+      {
+        "file": "libs/ui/card/src/lib/hlm-card-header.ts",
+        "hash": "990006228429064898"
+      },
+      {
+        "file": "libs/ui/card/src/lib/hlm-card-title.ts",
+        "hash": "3435606850267685193"
+      },
+      {
+        "file": "libs/ui/card/src/lib/hlm-card.token.ts",
+        "hash": "7940876708771924237"
+      },
+      {
+        "file": "libs/ui/card/src/lib/hlm-card.ts",
+        "hash": "10329445624946410398"
+      },
+      {
+        "file": "libs/ui/input/src/index.ts",
+        "hash": "7356458584027653927"
+      },
+      {
+        "file": "libs/ui/input/src/lib/hlm-input.ts",
+        "hash": "2996252188793191703"
+      },
+      {
+        "file": "libs/ui/label/src/index.ts",
+        "hash": "15789376508885056890"
+      },
+      {
+        "file": "libs/ui/label/src/lib/hlm-label.ts",
+        "hash": "494481167473422745"
+      },
+      {
+        "file": "libs/ui/utils/src/index.ts",
+        "hash": "12007391678651720588"
+      },
+      {
+        "file": "libs/ui/utils/src/lib/hlm.ts",
+        "hash": "3943643842782176706"
+      },
+      {
+        "file": "libs/ui/utils/src/lib/provide-spartan-hlm.ts",
+        "hash": "14818235350575591323"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "11342546957852349555"
+      },
+      {
+        "file": "package.json",
+        "hash": "886515425148331540"
+      },
+      {
+        "file": "public/favicon.ico",
+        "hash": "17037803431827586637"
+      },
+      {
+        "file": "src/app/app.config.ts",
+        "hash": "9077042579866035707"
+      },
+      {
+        "file": "src/app/app.css",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "src/app/app.html",
+        "hash": "8924268823485545554"
+      },
+      {
+        "file": "src/app/app.routes.ts",
+        "hash": "4513774361069444540"
+      },
+      {
+        "file": "src/app/app.spec.ts",
+        "hash": "2671146219153626432"
+      },
+      {
+        "file": "src/app/app.ts",
+        "hash": "5156676399418043126"
+      },
+      {
+        "file": "src/app/auth/components/device-registration/device-registration.html",
+        "hash": "453983749038029928"
+      },
+      {
+        "file": "src/app/auth/components/device-registration/device-registration.ts",
+        "hash": "15466215952367832052"
+      },
+      {
+        "file": "src/app/auth/components/login/login.html",
+        "hash": "12305020599794290045"
+      },
+      {
+        "file": "src/app/auth/components/login/login.ts",
+        "hash": "15133293478469467945"
+      },
+      {
+        "file": "src/app/auth/guard/auth-guard.ts",
+        "hash": "8109788478127275382"
+      },
+      {
+        "file": "src/app/auth/guard/guest-guard.ts",
+        "hash": "14802400626393412159"
+      },
+      {
+        "file": "src/app/auth/interceptors/credentials-interceptor.ts",
+        "hash": "6601971947069346215"
+      },
+      {
+        "file": "src/app/auth/interfaces/loginDTO.ts",
+        "hash": "3642075344658065253"
+      },
+      {
+        "file": "src/app/auth/layout/layout.html",
+        "hash": "11286422819539308891"
+      },
+      {
+        "file": "src/app/auth/layout/layout.ts",
+        "hash": "9678686577207717614"
+      },
+      {
+        "file": "src/app/auth/service/auth.ts",
+        "hash": "17077718696826703010"
+      },
+      {
+        "file": "src/app/clientes/interfaces/cliente.ts",
+        "hash": "6119084787512039709"
+      },
+      {
+        "file": "src/app/clientes/pages/components/item-cliente/item-cliente.html",
+        "hash": "5307373003954616160"
+      },
+      {
+        "file": "src/app/clientes/pages/components/item-cliente/item-cliente.ts",
+        "hash": "14689325633991746889"
+      },
+      {
+        "file": "src/app/clientes/pages/lista-clientes/lista-clientes/lista-clientes.html",
+        "hash": "14039271713196842842"
+      },
+      {
+        "file": "src/app/clientes/pages/lista-clientes/lista-clientes/lista-clientes.ts",
+        "hash": "459331778713285043"
+      },
+      {
+        "file": "src/app/clientes/services/clientes.ts",
+        "hash": "1381775611236726349"
+      },
+      {
+        "file": "src/app/shared/components/bottom-nav/bottom-nav.css",
+        "hash": "14995356980326120832"
+      },
+      {
+        "file": "src/app/shared/components/bottom-nav/bottom-nav.html",
+        "hash": "12238215182524204930"
+      },
+      {
+        "file": "src/app/shared/components/bottom-nav/bottom-nav.ts",
+        "hash": "1266912783738851318"
+      },
+      {
+        "file": "src/app/shared/layout/dashboard-layout.ts",
+        "hash": "9147685668428111780"
+      },
+      {
+        "file": "src/environments/environment.development.ts",
+        "hash": "12832552017715928528"
+      },
+      {
+        "file": "src/environments/environment.ts",
+        "hash": "12832552017715928528"
+      },
+      {
+        "file": "src/index.html",
+        "hash": "10523758703305154415"
+      },
+      {
+        "file": "src/main.ts",
+        "hash": "15944248449879998907"
+      },
+      {
+        "file": "src/styles.css",
+        "hash": "17754747165906590331"
+      },
+      {
+        "file": "tsconfig.app.json",
+        "hash": "7807138824267858546"
+      },
+      {
+        "file": "tsconfig.json",
+        "hash": "7234491830181491079"
+      },
+      {
+        "file": "tsconfig.spec.json",
+        "hash": "17063073924005338580"
+      }
+    ]
+  },
+  "externalNodesHash": "8125170729659380318"
+}

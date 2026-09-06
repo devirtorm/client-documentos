@@ -1,0 +1,62 @@
+import { Component, input, output, signal } from '@angular/core';
+import { Articulo } from '../../../interfaces/articulo';
+import { CurrencyPipe } from '@angular/common';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmInputImports } from '@spartan-ng/helm/input';
+
+export interface ArticuloCantidad {
+  articulo: Articulo;
+  cantidad: number;
+}
+
+@Component({
+  selector: 'app-item-articulo',
+  imports: [CurrencyPipe, ...HlmButtonImports, ...HlmInputImports],
+  templateUrl: './item-articulo.html',
+})
+export class ItemArticulo {
+  articulo = input.required<Articulo>();
+  cantidadInicial = input<number>(0);
+  cantidadChange = output<ArticuloCantidad>();
+
+  protected cantidad = signal(0);
+
+  ngOnInit(): void {
+    this.cantidad.set(this.cantidadInicial());
+  }
+
+  protected getInitials(descripcion: string): string {
+    return descripcion
+      .split(' ')
+      .slice(0, 2)
+      .map((n) => n.charAt(0))
+      .join('')
+      .toUpperCase();
+  }
+
+  protected incrementar(): void {
+    this.cantidad.update((v) => v + 1);
+    this.emitCantidad();
+  }
+
+  protected decrementar(): void {
+    if (this.cantidad() > 0) {
+      this.cantidad.update((v) => v - 1);
+      this.emitCantidad();
+    }
+  }
+
+  protected onCantidadInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = Math.max(0, Math.floor(Number(input.value) || 0));
+    this.cantidad.set(value);
+    this.emitCantidad();
+  }
+
+  private emitCantidad(): void {
+    this.cantidadChange.emit({
+      articulo: this.articulo(),
+      cantidad: this.cantidad()
+    });
+  }
+}

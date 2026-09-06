@@ -1,0 +1,140 @@
+<!-- Header fijo -->
+<app-header title="Historial">
+    <div bottom-content>
+        <!-- Tabs: Remisiones / Pedidos -->
+        <div class="tabs-container px-4 pb-0">
+            <button class="tab-btn" [class.active]="activeTab() === 'remisiones'" (click)="setTab('remisiones')">
+                <ng-icon name="lucideFileText" size="14" />
+                <span>Remisiones</span>
+                @if (totalElements() > 0 && activeTab() === 'remisiones') {
+                <span hlmBadge variant="secondary" class="tab-count">{{ totalElements() }}</span>
+                }
+            </button>
+            <button class="tab-btn" [class.active]="activeTab() === 'pedidos'" (click)="setTab('pedidos')">
+                <ng-icon name="lucideShoppingCart" size="14" />
+                <span>Pedidos</span>
+                @if (pedidosTotalElements() > 0 && activeTab() === 'pedidos') {
+                <span hlmBadge variant="secondary" class="tab-count">{{ pedidosTotalElements() }}</span>
+                }
+            </button>
+        </div>
+
+        <!-- Búsqueda -->
+        <div class="px-4 py-2">
+            <div class="relative">
+                <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+                    xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input hlmInput type="text"
+                    [placeholder]="activeTab() === 'remisiones' ? 'Buscar remisión...' : 'Buscar pedido...'"
+                    class="w-full pl-8 pr-3 h-9 text-sm rounded-lg" [value]="searchQuery()" (input)="onSearch($event)"
+                    id="search-historial" />
+            </div>
+        </div>
+    </div>
+</app-header>
+
+<!-- Contenido -->
+<main class="pb-6">
+    <!-- Tab Remisiones -->
+    @if (activeTab() === 'remisiones') {
+
+    <!-- Contador -->
+    <div class="flex items-center justify-between px-4 py-2 bg-muted/30">
+        <p class="text-[11px] text-muted-foreground">
+            {{ remisiones().length }} de {{ totalElements() }} remisión{{ totalElements() !== 1 ? 'es' : '' }}
+        </p>
+    </div>
+
+    <!-- Loading state -->
+    @if (isLoading()) {
+    <div class="loading-container">
+        <ng-icon name="lucideLoader2" size="24" class="loading-spinner" />
+        <p class="text-sm text-muted-foreground mt-2">Cargando remisiones...</p>
+    </div>
+    } @else {
+    <!-- Lista -->
+    <div class="list-container">
+        @for (remision of remisiones(); track remision.folio) {
+        <app-item-documento [documento]="remision" />
+        } @empty {
+        <div class="empty-state">
+            <ng-icon name="lucidePackageSearch" size="32" class="text-muted-foreground/50" />
+            <p class="text-sm font-medium text-foreground mb-0.5">Sin resultados</p>
+            <p class="text-xs text-muted-foreground">No se encontraron remisiones con ese criterio.</p>
+        </div>
+        }
+    </div>
+
+    <!-- Load more -->
+    @if (hasMoreRemisiones()) {
+    <div class="load-more-container">
+        <button hlmBtn variant="outline" size="sm" class="rounded-lg text-xs gap-1.5" (click)="loadMoreRemisiones()"
+            [disabled]="isLoadingMore()">
+            @if (isLoadingMore()) {
+            <ng-icon name="lucideLoader2" size="14" class="loading-spinner" />
+            Cargando...
+            } @else {
+            <ng-icon name="lucideChevronDown" size="14" />
+            Cargar más
+            }
+        </button>
+    </div>
+    }
+    }
+
+    }
+
+    <!-- Tab Pedidos -->
+    @if (activeTab() === 'pedidos') {
+
+    <!-- Contador -->
+    <div class="flex items-center justify-between px-4 py-2 bg-muted/30">
+        <p class="text-[11px] text-muted-foreground">
+            {{ pedidos().length }} de {{ pedidosTotalElements() }} pedido{{ pedidosTotalElements() !== 1 ? 's' :
+            '' }}
+        </p>
+    </div>
+
+    <!-- Loading state -->
+    @if (isLoading()) {
+    <div class="loading-container">
+        <ng-icon name="lucideLoader2" size="24" class="loading-spinner" />
+        <p class="text-sm text-muted-foreground mt-2">Cargando pedidos...</p>
+    </div>
+    } @else {
+    <!-- Lista -->
+    <div class="list-container">
+        @for (pedido of pedidos(); track pedido.folio) {
+        <app-item-documento [documento]="pedido" />
+        } @empty {
+        <div class="empty-state">
+            <ng-icon name="lucidePackageSearch" size="32" class="text-muted-foreground/50" />
+            <p class="text-sm font-medium text-foreground mb-0.5">Sin resultados</p>
+            <p class="text-xs text-muted-foreground">No se encontraron pedidos con ese criterio.</p>
+        </div>
+        }
+    </div>
+
+    <!-- Load more -->
+    @if (hasMorePedidos()) {
+    <div class="load-more-container">
+        <button hlmBtn variant="outline" size="sm" class="rounded-lg text-xs gap-1.5" (click)="loadMorePedidos()"
+            [disabled]="isLoadingMore()">
+            @if (isLoadingMore()) {
+            <ng-icon name="lucideLoader2" size="14" class="loading-spinner" />
+            Cargando...
+            } @else {
+            <ng-icon name="lucideChevronDown" size="14" />
+            Cargar más
+            }
+        </button>
+    </div>
+    }
+    }
+
+    }
+</main>

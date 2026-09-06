@@ -1,0 +1,88 @@
+<!-- Card de remisión -->
+<div class="remision-card" [class.expanded]="expanded" [attr.id]="'documento-' + documento().folio">
+
+    <!-- Header clickeable -->
+    <button class="card-header" (click)="toggle()" [attr.aria-expanded]="expanded">
+        <!-- Icono + Folio -->
+        <div class="header-left">
+            <div class="folio-icon">
+                <ng-icon name="lucidePackage" size="16" />
+            </div>
+            <div class="header-info">
+                <div class="folio-row">
+                    <span class="folio-text">{{ documento().folio }}</span>
+                    <span hlmBadge [variant]="getStatusVariant()" class="status-badge">
+                        {{ documento().status }}
+                    </span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-item">
+                        <ng-icon name="lucideCalendar" size="10" />
+                        {{ documento().fecha | date:'dd/MM/yyyy' }}
+                    </span>
+                    <span class="meta-separator"></span>
+                    <span class="meta-item">
+                        <ng-icon name="lucideUser" size="10" />
+                        {{ documento().cliProv }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Importe + Chevron -->
+        <div class="header-right">
+            <span class="importe">{{ documento().total | currency:'$' }}</span>
+            <ng-icon name="lucideChevronDown" size="16" class="chevron-icon" [class.rotated]="expanded" />
+        </div>
+    </button>
+
+    <!-- Panel de detalles expandible -->
+    @if (expanded) {
+    <div class="details-panel">
+        <div class="details-header">
+            <span class="details-title">Artículos ({{ documento().detalles?.length ?? 0 }})</span>
+        </div>
+
+        <!-- Tabla de detalles con Spartan Table -->
+        <div hlmTableContainer class="details-table-container">
+            <table hlmTable class="details-table">
+                <thead hlmTHead>
+                    <tr hlmTr>
+                        <th hlmTh class="col-articulo">Artículo</th>
+                        <th hlmTh class="col-qty">Cant.</th>
+                        <th hlmTh class="col-precio">Precio</th>
+                        <th hlmTh class="col-importe">Importe</th>
+                    </tr>
+                </thead>
+                <tbody hlmTBody>
+                    @for (detalle of documento().detalles; track detalle.consecutivo) {
+                    <tr hlmTr>
+                        <td hlmTd class="col-articulo">
+                            <div class="articulo-cell">
+                                <span class="articulo-code">{{ detalle.articulo }}</span>
+                                <span class="articulo-desc">{{ detalle.descripcion }}</span>
+                            </div>
+                        </td>
+                        <td hlmTd class="col-qty">{{ detalle.cantidad | number:'1.0-2' }}</td>
+                        <td hlmTd class="col-precio">{{ detalle.precio | currency:'$' }}</td>
+                        <td hlmTd class="col-importe">{{ detalle.importeTotal | currency:'$' }}</td>
+                    </tr>
+                    } @empty {
+                    <tr hlmTr>
+                        <td hlmTd colspan="4" class="empty-details">
+                            Sin detalles disponibles
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer con total -->
+        <div class="details-footer">
+            <span class="total-label">Total</span>
+            <span class="total-value">{{ documento().total | currency:'$' }}</span>
+        </div>
+    </div>
+    }
+</div>

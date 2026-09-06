@@ -1,0 +1,103 @@
+<li class="px-4 py-2" [attr.id]="'articulo-' + articulo().clave">
+    <div class="rounded-2xl border transition-all duration-200 overflow-hidden"
+        [class]="cantidad() > 0
+            ? 'border-primary/30 bg-primary/[0.03] shadow-sm shadow-primary/10'
+            : 'border-border/70 bg-card'">
+
+        <!-- Contenido principal -->
+        <div class="flex items-start gap-3 p-3.5">
+            <!-- Avatar / Imagen -->
+            <div class="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold tracking-tight transition-all duration-200"
+                [class]="cantidad() > 0
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-gradient-to-br from-muted to-muted/60 text-muted-foreground'">
+                {{ getInitials(articulo()!.descripcion) }}
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 min-w-0 pt-0.5">
+                <p class="text-[13px] font-semibold text-foreground leading-snug line-clamp-2">
+                    {{ articulo()!.descripcion }}
+                </p>
+                <div class="flex items-center gap-1.5 mt-1">
+                    <span
+                        class="inline-flex items-center text-[10px] font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
+                        {{ articulo()!.clave }}
+                    </span>
+                    @if (articulo()!.unidadPrimaria) {
+                    <span
+                        class="inline-flex items-center text-[10px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
+                        {{ articulo()!.unidadPrimaria }}
+                    </span>
+                    }
+                    <span class="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-md"
+                        [class]="(articulo()!.existenciaTotal ?? 0) > 0
+                            ? 'text-emerald-700 bg-emerald-500/10'
+                            : 'text-red-600 bg-red-500/10'">
+                        <span class="w-1 h-1 rounded-full"
+                            [class]="(articulo()!.existenciaTotal ?? 0) > 0 ? 'bg-emerald-500' : 'bg-red-500'">
+                        </span>
+                        @if ((articulo()!.existenciaTotal ?? 0) > 0) {
+                            {{ articulo()!.existenciaTotal }} disp.
+                        } @else {
+                            Agotado
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <!-- Precio -->
+            <div class="shrink-0 text-right pt-0.5">
+                <p class="text-[15px] font-bold text-foreground tabular-nums tracking-tight">
+                    {{ articulo()!.precio1 | currency:'$' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Barra inferior: Controles de cantidad -->
+        <div class="flex items-center justify-between px-3.5 pb-3 pt-0.5">
+            @if (cantidad() > 0) {
+            <span class="text-[11px] text-muted-foreground">
+                Subtotal
+                <span class="font-bold text-foreground ml-0.5 tabular-nums">
+                    {{ (articulo()!.precio1 ?? 0) * cantidad() | currency:'$' }}
+                </span>
+            </span>
+            } @else {
+            <span></span>
+            }
+
+            <!-- Stepper -->
+            <div class="flex items-center gap-0.5">
+                @if (cantidad() > 0) {
+                <button hlmBtn variant="outline" size="sm"
+                    class="h-8 w-8 rounded-xl p-0 border-border/70"
+                    (click)="decrementar(); $event.stopPropagation()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14" />
+                    </svg>
+                </button>
+
+                <input type="number" min="0"
+                    class="w-10 h-8 text-center text-xs font-bold bg-transparent focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    [value]="cantidad()"
+                    (input)="onCantidadInput($event)"
+                    (click)="$event.stopPropagation()" />
+                }
+
+                <button hlmBtn size="sm"
+                    [variant]="cantidad() > 0 ? 'outline' : 'default'"
+                    class="h-8 rounded-xl p-0 border-border/70"
+                    [class]="cantidad() > 0 ? 'w-8' : 'w-8'"
+                    (click)="incrementar(); $event.stopPropagation()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14" />
+                        <path d="M12 5v14" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</li>

@@ -1,0 +1,190 @@
+<!-- Header -->
+<app-header 
+    [title]="isEditMode() ? 'Editar Cliente' : 'Registrar Cliente'"
+    [subtitle]="isEditMode() ? clienteNombre() : 'Complete los datos del nuevo cliente'"
+    [showBackBtn]="true"
+    (back)="goBack()">
+</app-header>
+
+<main class="px-4 py-5 pb-24">
+
+    <!-- Loading skeleton -->
+    @if (isLoading()) {
+    <div class="flex flex-col gap-4 animate-pulse">
+        <div class="h-32 rounded-xl bg-muted/60"></div>
+        <div class="h-24 rounded-xl bg-muted/60"></div>
+        <div class="h-36 rounded-xl bg-muted/60"></div>
+    </div>
+    } @else {
+
+    <!-- Error message -->
+    @if (errorMessage()) {
+    <div class="mb-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 flex items-start gap-2.5">
+        <ng-icon name="lucideAlertTriangle" class="text-destructive text-sm shrink-0 mt-0.5" />
+        <p class="text-sm text-destructive">{{ errorMessage() }}</p>
+    </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" id="registrar-form">
+
+        <!-- Datos principales -->
+        <hlm-card class="mb-4">
+            <hlm-card-header class="pb-3">
+                <h3 hlmCardTitle class="text-sm">Datos principales</h3>
+                <p hlmCardDescription>{{ isEditMode() ? 'La clave no puede ser modificada' : 'Información básica del cliente' }}</p>
+            </hlm-card-header>
+            <div hlmCardContent class="flex flex-col gap-4">
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="clave">Clave *</label>
+                    <input formControlName="clave" type="text" id="clave" placeholder="Ej. C-001250" required
+                        hlmInput
+                        [class.bg-muted/50]="isEditMode()"
+                        [class.text-muted-foreground]="isEditMode()"
+                        [class.cursor-not-allowed]="isEditMode()" />
+                    @if (form.controls.clave.touched && form.controls.clave.errors?.['required']) {
+                    <p class="text-xs text-destructive">La clave es obligatoria</p>
+                    }
+                </div>
+
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="nombre">Nombre *</label>
+                    <input formControlName="nombre" type="text" id="nombre" placeholder="Nombre completo del cliente"
+                        required hlmInput />
+                    @if (form.controls.nombre.touched && form.controls.nombre.errors?.['required']) {
+                    <p class="text-xs text-destructive">El nombre es obligatorio</p>
+                    }
+                </div>
+            </div>
+        </hlm-card>
+
+        <!-- Contacto -->
+        <hlm-card class="mb-4">
+            <hlm-card-header class="pb-3">
+                <h3 hlmCardTitle class="text-sm">Contacto</h3>
+                <p hlmCardDescription>Puedes ingresar mas de un número telefónico separandolos por una coma</p>
+            </hlm-card-header>
+            <div hlmCardContent class="flex flex-col gap-4">
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="telefono">Teléfono</label>
+                    <input formControlName="telefono" type="tel" id="telefono" placeholder="Ej. 614 123 4567"
+                        hlmInput />
+                </div>
+            </div>
+        </hlm-card>
+
+        <!-- Ubicación -->
+        <hlm-card class="mb-4">
+            <hlm-card-header class="pb-3">
+                <h3 hlmCardTitle class="text-sm">Ubicación y visitas</h3>
+                <p hlmCardDescription>Dirección y día de revisión</p>
+            </hlm-card-header>
+            <div hlmCardContent class="flex flex-col gap-4">
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="ciudad">Ciudad / Zona</label>
+                    <input formControlName="ciudad" type="text" id="ciudad" placeholder="Ej. Zona Norte" hlmInput />
+                </div>
+
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="direccion">Dirección</label>
+                    <input formControlName="direccion" type="text" id="direccion"
+                        placeholder="Calle, número, colonia..." hlmInput />
+                </div>
+
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="diaRevision">Día de revisión</label>
+                    <input formControlName="diaRevision" type="text" id="diaRevision" placeholder="Ej. Lunes, Miércoles"
+                        hlmInput />
+                </div>
+            </div>
+        </hlm-card>
+
+        <!-- Campos Adicionales (Texto) -->
+        <hlm-card class="mb-4">
+            <hlm-card-header class="pb-3">
+                <h3 hlmCardTitle class="text-sm">Datos adicionales</h3>
+                <p hlmCardDescription>Información complementaria (Extra 1 - 4)</p>
+            </hlm-card-header>
+            <div hlmCardContent class="grid grid-cols-2 gap-4">
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="extra1">Extra 1</label>
+                    <input formControlName="extra1" type="text" id="extra1" placeholder="Dato extra 1" hlmInput />
+                </div>
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="extra2">Extra 2</label>
+                    <input formControlName="extra2" type="text" id="extra2" placeholder="Dato extra 2" hlmInput />
+                </div>
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="extra3">Extra 3</label>
+                    <input formControlName="extra3" type="text" id="extra3" placeholder="Dato extra 3" hlmInput />
+                </div>
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="extra4">Extra 4</label>
+                    <input formControlName="extra4" type="text" id="extra4" placeholder="Dato extra 4" hlmInput />
+                </div>
+            </div>
+        </hlm-card>
+
+        <!-- Campos Adicionales (Numéricos / N) -->
+        <hlm-card class="mb-6">
+            <hlm-card-header class="pb-3">
+                <h3 hlmCardTitle class="text-sm">Campos numéricos adicionales</h3>
+                <p hlmCardDescription>Valores extra (N1 - N4)</p>
+            </hlm-card-header>
+            <div hlmCardContent class="grid grid-cols-2 gap-4">
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="extraN1">Extra N1</label>
+                    <input formControlName="extraN1" type="number" id="extraN1" placeholder="Extra N1" hlmInput />
+                </div>
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="extraN2">Extra N2</label>
+                    <input formControlName="extraN2" type="number" id="extraN2" placeholder="Extra N2" hlmInput />
+                </div>
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="extraN3">Extra N3</label>
+                    <input formControlName="extraN3" type="number" id="extraN3" placeholder="Extra N3" hlmInput />
+                </div>
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="extraN4">Extra N4</label>
+                    <input formControlName="extraN4" type="number" id="extraN4" placeholder="Extra N4" hlmInput />
+                </div>
+            </div>
+        </hlm-card>
+
+        <!-- Submit -->
+        <button hlmBtn type="submit" class="w-full gap-2 rounded-xl h-12 text-sm font-semibold shadow-sm shadow-primary/20"
+            [disabled]="isSubmitting() || (isEditMode() && form.pristine)" form="registrar-form">
+            @if (isSubmitting()) {
+            <ng-icon name="lucideLoader2" class="text-sm animate-spin" />
+            {{ isEditMode() ? 'Guardando...' : 'Registrando...' }}
+            } @else {
+            <ng-icon [name]="isEditMode() ? 'lucideSave' : 'lucideUserPlus'" class="text-sm" />
+            {{ isEditMode() ? 'Guardar Cambios' : 'Registrar Cliente' }}
+            }
+        </button>
+
+    </form>
+    }
+</main>
+
+<!-- Modal Protección de abandono -->
+@if (showLeaveModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <hlm-card class="w-full max-w-sm shadow-lg animate-in zoom-in-95 duration-200">
+        <hlm-card-header>
+            <div class="flex items-center gap-2 text-destructive mb-1">
+                <ng-icon name="lucideAlertTriangle" class="text-xl" />
+                <h3 hlmCardTitle class="text-lg">{{ isEditMode() ? '¿Descartar los cambios?' : '¿Abandonar el registro?' }}</h3>
+            </div>
+            <p hlmCardDescription>{{ isEditMode() ? 'Tienes cambios sin guardar. Si abandonas, se perderán las modificaciones realizadas.' : 'Tienes cambios sin guardar. Si abandonas esta página, se perderán los datos que has ingresado.' }}</p>
+        </hlm-card-header>
+        <div hlmCardContent class="flex gap-3 justify-end mt-2">
+            <button hlmBtn variant="outline" (click)="cancelLeave()">
+                Cancelar
+            </button>
+            <button hlmBtn variant="destructive" (click)="confirmLeave()">
+                Abandonar
+            </button>
+        </div>
+    </hlm-card>
+</div>
+}

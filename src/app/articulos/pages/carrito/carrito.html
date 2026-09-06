@@ -1,0 +1,153 @@
+<!-- Header -->
+<app-header title="Mi Pedido" [showBackBtn]="true" (back)="volver()">
+    <div subtitle-content class="text-[11px] text-muted-foreground mt-0.5">
+        @if (!isLoading() && !isEmpty()) {
+        {{ totalItems() }} artículo{{ totalItems() !== 1 ? 's' : '' }}
+        } @else if (!isLoading() && isEmpty()) {
+        Sin artículos
+        }
+    </div>
+
+    <!-- Botón limpiar todo -->
+    <ng-container right-action>
+        @if (!isEmpty()) {
+        <button hlmBtn variant="ghost" size="sm"
+            class="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl text-xs h-8 px-2.5 mr-2"
+            (click)="limpiarTodo()" id="btn-limpiar-carrito">
+            <ng-icon name="lucideTrash2" size="14" class="mr-1" />
+            Vaciar
+        </button>
+        }
+    </ng-container>
+</app-header>
+
+<!-- Contenido -->
+<main class="pb-32">
+    @if (isLoading()) {
+    <!-- Skeleton loading -->
+    <div class="flex flex-col gap-3 px-4 pt-4">
+        @for (i of [1, 2, 3]; track i) {
+        <div class="rounded-2xl border border-border/70 bg-card p-4 animate-pulse">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-muted"></div>
+                <div class="flex-1 space-y-2">
+                    <div class="h-4 bg-muted rounded-md w-3/4"></div>
+                    <div class="h-3 bg-muted rounded-md w-1/3"></div>
+                </div>
+                <div class="h-5 bg-muted rounded-md w-16"></div>
+            </div>
+        </div>
+        }
+    </div>
+    } @else if (isEmpty()) {
+    <!-- Estado vacío -->
+    <div class="flex flex-col items-center justify-center py-24 px-6 text-center">
+        <div class="w-20 h-20 rounded-3xl bg-muted/60 flex items-center justify-center mb-5">
+            <ng-icon name="lucidePackageOpen" size="36" class="text-muted-foreground" />
+        </div>
+        <p class="text-base font-semibold text-foreground mb-1.5">Tu pedido está vacío</p>
+        <p class="text-sm text-muted-foreground max-w-[260px] mb-6">
+            Agrega artículos desde el catálogo para comenzar a armar tu pedido.
+        </p>
+        <button hlmBtn variant="default" class="rounded-xl h-10 px-5" (click)="volver()" id="btn-ir-catalogo">
+            <ng-icon name="lucideShoppingCart" size="16" class="mr-2" />
+            Ir al catálogo
+        </button>
+    </div>
+    } @else {
+    <!-- Lista de items -->
+    <ul class="flex flex-col gap-3 px-4 pt-4">
+        @for (item of items(); track item.articuloClave) {
+        <li class="carrito-item rounded-2xl border border-border/70 bg-card overflow-hidden"
+            [attr.id]="'carrito-item-' + item.articuloClave">
+            <div class="flex items-start gap-3 p-3.5">
+                <!-- Avatar -->
+                <div
+                    class="shrink-0 w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold tracking-tight shadow-sm">
+                    {{ getInitials(item.articuloDescripcion) }}
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0 pt-0.5">
+                    <p class="text-[13px] font-semibold text-foreground leading-snug line-clamp-2">
+                        {{ item.articuloDescripcion }}
+                    </p>
+                    <div class="flex items-center gap-1.5 mt-1">
+                        <span
+                            class="inline-flex items-center text-[10px] font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
+                            {{ item.articuloClave }}
+                        </span>
+                        <span class="text-[11px] text-muted-foreground">
+                            {{ item.articuloPrecio | currency:'$' }} c/u
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Eliminar -->
+                <button hlmBtn variant="ghost" size="icon"
+                    class="shrink-0 h-8 w-8 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    (click)="eliminarItem(item)" [attr.id]="'btn-eliminar-' + item.articuloClave">
+                    <ng-icon name="lucideTrash2" size="14" />
+                </button>
+            </div>
+
+            <!-- Barra inferior: controles cantidad + subtotal -->
+            <div class="flex items-center justify-between px-3.5 pb-3 pt-0.5">
+                <span class="text-[11px] text-muted-foreground">
+                    Subtotal
+                    <span class="font-bold text-foreground ml-0.5 tabular-nums">
+                        {{ item.articuloPrecio * item.cantidad | currency:'$' }}
+                    </span>
+                </span>
+
+                <!-- Stepper -->
+                <div class="flex items-center gap-0.5">
+                    <button hlmBtn variant="outline" size="sm" class="h-8 w-8 rounded-xl p-0 border-border/70"
+                        (click)="decrementar(item)">
+                        <ng-icon name="lucideMinus" size="14" />
+                    </button>
+
+                    <span class="w-10 h-8 flex items-center justify-center text-xs font-bold tabular-nums">
+                        {{ item.cantidad }}
+                    </span>
+
+                    <button hlmBtn variant="outline" size="sm" class="h-8 w-8 rounded-xl p-0 border-border/70"
+                        (click)="incrementar(item)">
+                        <ng-icon name="lucidePlus" size="14" />
+                    </button>
+                </div>
+            </div>
+        </li>
+        }
+    </ul>
+    }
+</main>
+
+<!-- Footer fijo: resumen del pedido -->
+@if (!isEmpty() && !isLoading()) {
+<div
+    class="fixed bottom-16 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border safe-area-bottom">
+    <div class="px-4 py-3 max-w-lg mx-auto">
+        <!-- Resumen -->
+        <div class="flex items-center justify-between mb-3">
+            <div class="text-sm text-muted-foreground">
+                <span class="font-medium text-foreground">{{ totalItems() }}</span>
+                artículo{{ totalItems() !== 1 ? 's' : '' }}
+            </div>
+            <div class="text-right">
+                <span class="text-[11px] text-muted-foreground block">Total</span>
+                <span class="text-lg font-bold text-foreground tabular-nums tracking-tight">
+                    {{ totalPrecio() | currency:'$' }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Botón confirmar -->
+        <button hlmBtn variant="default" class="w-full h-12 text-sm font-semibold" id="btn-confirmar-pedido"
+            (click)="guardarDocumento()">
+            <ng-icon name="lucideShoppingCart" size="18" class="mr-2" />
+            Confirmar pedido
+        </button>
+    </div>
+</div>
+}

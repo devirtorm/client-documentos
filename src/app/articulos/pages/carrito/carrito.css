@@ -1,0 +1,7 @@
+.carrito-item {
+    transition: all 0.2s ease;
+}
+
+.carrito-item:active {
+    transform: scale(0.98);
+}

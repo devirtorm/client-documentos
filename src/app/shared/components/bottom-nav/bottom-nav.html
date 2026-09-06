@@ -1,0 +1,46 @@
+<nav class="bg-background/95 backdrop-blur-xl border-t border-border safe-area-bottom">
+    <div class="flex items-stretch justify-around max-w-lg mx-auto">
+
+        @for (item of navItems; track item.route) {
+        <a [routerLink]="item.route" routerLinkActive="active-tab" [routerLinkActiveOptions]="{ exact: false }" hlmBtn
+            variant="ghost" class="tab-item" #rla="routerLinkActive">
+
+            <!-- Active indicator dot -->
+            @if (rla.isActive) {
+            <span class="absolute -top-px left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-primary"></span>
+            }
+
+            <ng-icon [name]="item.icon" class="size-5" />
+
+            <span class="tab-label" [class.font-semibold]="rla.isActive" [class.text-foreground]="rla.isActive">{{
+                item.label }}</span>
+        </a>
+        }
+
+        <!-- Separator -->
+        <div class="w-px my-3 bg-border"></div>
+
+        <!-- Offline Toggle -->
+        <div class="tab-item text-muted-foreground hover:bg-transparent" style="cursor: default"
+            (click)="$event.stopPropagation()">
+            <hlm-switch size="sm" id="offline-switch" name="offlineToggle" class="scale-[0.85]" [ngModel]="!isOnline"
+                (ngModelChange)="onToggleChange($event)" />
+            <span class="tab-label mt-0.5">{{ isOnline ? 'Online' : 'Offline' }}</span>
+        </div>
+
+        <!-- Separator -->
+        <div class="w-px my-3 bg-border"></div>
+
+        <!-- Logout -->
+        <button hlmBtn variant="ghost" class="tab-item text-muted-foreground" (click)="logout()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+            <span class="tab-label">Salir</span>
+        </button>
+
+    </div>
+</nav>

@@ -1,0 +1,170 @@
+import { Component, inject, signal } from '@angular/core';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, Subject } from 'rxjs';
+import { HlmCardImports } from '@spartan-ng/helm/card';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmInputImports } from '@spartan-ng/helm/input';
+import { HlmLabelImports } from '@spartan-ng/helm/label';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideArrowLeft, lucideUserPlus, lucideSave, lucideLoader2, lucideAlertTriangle } from '@ng-icons/lucide';
+import { Clientes } from '../../services/clientes';
+import { CanComponentDeactivate } from '../../../shared/guards/unsaved-changes.guard';
+import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
+
+@Component({
+  selector: 'app-registrar-cliente',
+  imports: [
+    ReactiveFormsModule,
+    NgIcon,
+    ...HlmCardImports,
+    ...HlmButtonImports,
+    ...HlmInputImports,
+    ...HlmLabelImports,
+    AppHeaderComponent
+  ],
+  providers: [
+    provideIcons({
+      lucideArrowLeft,
+      lucideUserPlus,
+      lucideSave,
+      lucideLoader2,
+      lucideAlertTriangle,
+    }),
+  ],
+  templateUrl: './registrar-cliente.html',
+})
+export class RegistrarCliente implements CanComponentDeactivate {
+  private fb = inject(NonNullableFormBuilder);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private clientesService = inject(Clientes);
+
+  protected readonly isEditMode = signal(false);
+  protected readonly isLoading = signal(false);
+  protected readonly isSubmitting = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
+  protected readonly showLeaveModal = signal(false);
+  protected readonly clienteNombre = signal('');
+  private leaveResponse?: Subject<boolean>;
+
+  form = this.fb.group({
+    clave: ['', Validators.required],
+    nombre: ['', Validators.required],
+    telefono: [''],
+    email: [''],
+    ciudad: [''],
+    direccion: [''],
+    diaRevision: [''],
+    esClienteBase: [''],
+    extra1: [''],
+    extra2: [''],
+    extra3: [''],
+    extra4: [''],
+    extraN1: [''],
+    extraN2: [''],
+    extraN3: [''],
+    extraN4: [''],
+  });
+
+  ngOnInit(): void {
+    const clave = this.route.snapshot.paramMap.get('clave');
+    if (clave) {
+      this.isEditMode.set(true);
+      this.isLoading.set(true);
+      this.form.controls.clave.disable();
+
+      this.clientesService.getCliente(clave).subscribe({
+        next: (cliente) => {
+          this.form.patchValue({
+            clave: cliente.clave,
+            nombre: cliente.nombre,
+            telefono: cliente.telefono ?? '',
+            email: cliente.email ?? '',
+            ciudad: cliente.ciudad ?? '',
+            direccion: cliente.direccion ?? '',
+            diaRevision: cliente.diaRevision ?? '',
+            esClienteBase: cliente.esClienteBase ?? '',
+            extra1: cliente.extra1 ?? '',
+            extra2: cliente.extra2 ?? '',
+            extra3: cliente.extra3 ?? '',
+            extra4: cliente.extra4 ?? '',
+            extraN1: String(cliente.extraN1 ?? ''),
+            extraN2: String(cliente.extraN2 ?? ''),
+            extraN3: String(cliente.extraN3 ?? ''),
+            extraN4: String(cliente.extraN4 ?? ''),
+          });
+          this.clienteNombre.set(cliente.nombre);
+          this.form.markAsPristine();
+          this.isLoading.set(false);
+        },
+        error: (err: any) => {
+          this.isLoading.set(false);
+          this.errorMessage.set('No se pudo cargar los datos del cliente.');
+          console.error('Error al cargar cliente:', err);
+        },
+      });
+    }
+  }
+
+  onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
+
+    const formData = this.form.getRawValue();
+
+    const request$ = this.isEditMode()
+      ? this.clientesService.actualizarCliente(formData.clave, formData)
+      : this.clientesService.crearCliente(formData);
+
+    request$.subscribe({
+      next: () => {
+        this.form.markAsPristine();
+        this.router.navigate(['/clientes']);
+      },
+      error: (err: any) => {
+        this.isSubmitting.set(false);
+        this.errorMessage.set(
+          this.isEditMode()
+            ? 'No se pudo actualizar el cliente. Intente de nuevo.'
+            : 'No se pudo registrar el cliente. Intente de nuevo.'
+        );
+        console.error('Error:', err);
+      },
+    });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/clientes']);
+  }
+
+  canDeactivate(): Observable<boolean> | boolean {
+    if (this.form.dirty && !this.isSubmitting()) {
+      this.leaveResponse = new Subject<boolean>();
+      this.showLeaveModal.set(true);
+      return this.leaveResponse.asObservable();
+    }
+    return true;
+  }
+
+  confirmLeave(): void {
+    this.showLeaveModal.set(false);
+    if (this.leaveResponse) {
+      this.leaveResponse.next(true);
+      this.leaveResponse.complete();
+    }
+  }
+
+  cancelLeave(): void {
+    this.showLeaveModal.set(false);
+    if (this.leaveResponse) {
+      this.leaveResponse.next(false);
+      this.leaveResponse.complete();
+    }
+  }
+}
