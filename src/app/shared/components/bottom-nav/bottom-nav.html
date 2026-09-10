@@ -1,46 +1,96 @@
-<nav class="bg-background/95 backdrop-blur-xl border-t border-border safe-area-bottom">
-    <div class="flex items-stretch justify-around max-w-lg mx-auto">
+<nav class="m-1 bg-background/20 rounded-3xl backdrop-blur-xl border-b-2 border-t-2 border-border safe-area-bottom">
+    <div class="flex items-stretch justify-around max-w-lg mx-auto px-2">
+
+        <hlm-sheet class="flex flex-1">
+            <button hlmSheetTrigger side="bottom" hlmBtn variant="ghost" class="tab-item w-full text-muted-foreground hover:bg-transparent">
+                <ng-icon name="lucideUser" class="size-5"></ng-icon>
+                <span class="tab-label">Perfil</span>
+            </button>
+            <hlm-sheet-content *hlmSheetPortal="let ctx" class="data-[side=bottom]:max-h-[85vh] overflow-y-auto rounded-t-3xl p-6 flex flex-col">
+
+                <!-- Handle -->
+                <div class="w-9 h-1 bg-muted-foreground/30 rounded-full mx-auto mb-5"></div>
+
+                <!-- Avatar + datos + estado -->
+                <div class="flex items-center gap-3.5 mb-5">
+                    <div class="w-13 h-13 bg-muted rounded-full flex items-center justify-center text-muted-foreground shrink-0">
+                        <ng-icon name="lucideUser" class="w-6 h-6"></ng-icon>
+                    </div>
+                    <div class="min-w-0">
+                        <h2 class="text-[17px] font-medium truncate">{{ auth.currentUser() || 'Usuario' }}</h2>
+                        <p class="text-[13px] text-muted-foreground truncate">
+                            {{ auth.currentAgente() || 'Agente' }} · {{ auth.currentAlmacen() || 'N/A' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Estado de conexión (Switch) -->
+                <div class="flex items-center gap-4 mb-8 px-5 py-4 bg-muted/50 rounded-2xl w-full">
+                    <ng-icon [name]="isOnline ? 'lucideWifi' : 'lucideWifiOff'" 
+                             [class]="isOnline ? 'text-green-600 w-6 h-6' : 'text-red-600 w-6 h-6'"></ng-icon>
+                    <div class="flex flex-col flex-1">
+                        <span class="font-semibold text-sm">{{ isOnline ? 'Modo Online' : 'Modo Offline' }}</span>
+                        <span class="text-xs text-muted-foreground mt-0.5">{{ isOnline ? 'Sincronización activa' : 'Trabajando de forma local' }}</span>
+                    </div>
+                    <hlm-switch 
+                        id="offline-switch" 
+                        name="offlineToggle" 
+                        [ngModel]="isOnline"
+                        (ngModelChange)="onToggleChange(!$event)" />
+                </div>
+
+                <!-- Acciones secundarias -->
+                <div class="rounded-xl border border-border overflow-hidden mb-4">
+
+                    <button routerLink="/sincronizar" (click)="ctx.close()"
+                        class="w-full flex items-center gap-3 px-3.5 py-3 border-b border-border text-left hover:bg-muted/50 transition-colors">
+                        <div class="w-8.5 h-8.5 rounded-[9px] bg-primary/10 flex items-center justify-center shrink-0">
+                            <ng-icon name="lucideCloudSync" class="w-4.5 h-4.5 text-primary"></ng-icon>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium leading-tight">Sincronizar documentos</p>
+                            <p class="text-xs text-muted-foreground leading-tight mt-0.5"></p>
+                        </div>
+                        <ng-icon name="lucideChevronRight" class="w-4 h-4 text-muted-foreground shrink-0"></ng-icon>
+                    </button>
+
+                    <button disabled
+                        class="w-full flex items-center gap-3 px-3.5 py-3 border-b border-border text-left hover:bg-muted/50 transition-colors">
+                        <div class="w-8.5 h-8.5 rounded-[9px] bg-muted flex items-center justify-center shrink-0">
+                            <ng-icon name="lucideSettings" class="w-4.5 h-4.5 text-muted-foreground"></ng-icon>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium leading-tight">Configuración</p>
+                            <p class="text-xs text-muted-foreground leading-tight mt-0.5">Próximamente</p>
+                        </div>
+                    </button>
+
+                </div>
+
+                <!-- Cerrar sesión -->
+                <div class="mt-auto">
+                    <button hlmBtn variant="destructive" class="w-full rounded-xl h-11" (click)="logout()">
+                        <ng-icon name="lucideLogOut" class="mr-2 w-4.5 h-4.5"></ng-icon>
+                        Cerrar sesión
+                    </button>
+                </div>
+
+            </hlm-sheet-content>
+        </hlm-sheet>
 
         @for (item of navItems; track item.route) {
         <a [routerLink]="item.route" routerLinkActive="active-tab" [routerLinkActiveOptions]="{ exact: false }" hlmBtn
             variant="ghost" class="tab-item" #rla="routerLinkActive">
 
-            <!-- Active indicator dot -->
             @if (rla.isActive) {
             <span class="absolute -top-px left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full bg-primary"></span>
             }
 
-            <ng-icon [name]="item.icon" class="size-5" />
-
-            <span class="tab-label" [class.font-semibold]="rla.isActive" [class.text-foreground]="rla.isActive">{{
-                item.label }}</span>
+            <ng-icon [name]="item.icon" class="size-5"></ng-icon>
+            <span class="tab-label" [class.font-semibold]="rla.isActive" [class.text-foreground]="rla.isActive">
+                {{ item.label }}
+            </span>
         </a>
         }
-
-        <!-- Separator -->
-        <div class="w-px my-3 bg-border"></div>
-
-        <!-- Offline Toggle -->
-        <div class="tab-item text-muted-foreground hover:bg-transparent" style="cursor: default"
-            (click)="$event.stopPropagation()">
-            <hlm-switch size="sm" id="offline-switch" name="offlineToggle" class="scale-[0.85]" [ngModel]="!isOnline"
-                (ngModelChange)="onToggleChange($event)" />
-            <span class="tab-label mt-0.5">{{ isOnline ? 'Online' : 'Offline' }}</span>
-        </div>
-
-        <!-- Separator -->
-        <div class="w-px my-3 bg-border"></div>
-
-        <!-- Logout -->
-        <button hlmBtn variant="ghost" class="tab-item text-muted-foreground" (click)="logout()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" x2="9" y1="12" y2="12" />
-            </svg>
-            <span class="tab-label">Salir</span>
-        </button>
-
     </div>
 </nav>

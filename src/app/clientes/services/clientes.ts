@@ -2,7 +2,7 @@ import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Cliente } from '../interfaces/cliente';
 import { environment } from '../../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Auth } from '../../auth/service/auth';
 
 @Service()
@@ -14,12 +14,9 @@ export class Clientes {
     getClientes(): Observable<Cliente[]> {
         const claveAgente = this.auth.currentAgente();
         const claveUsuario = this.auth.currentUser();
-        const options = {
-            params: {
-                idUsuario: claveUsuario
-            }
-        }
-        return this.http.get<Cliente[]>(`${this.apiUrl}/${claveAgente}`, options);
+        const params = new HttpParams()
+            .set('idUsuario', claveUsuario ?? '');
+        return this.http.get<Cliente[]>(`${this.apiUrl}/${claveAgente}`, { params });
     }
 
     crearCliente(cliente: Omit<Cliente, 'id'>): Observable<Cliente> {

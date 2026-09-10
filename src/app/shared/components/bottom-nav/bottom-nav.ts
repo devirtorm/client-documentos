@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { lucideHome, lucideUsers, lucideContactRound, lucideListOrdered, lucideFileArchive, lucideFile, lucideCloudSync } from '@ng-icons/lucide';
+import { lucideHome, lucideUsers, lucideContactRound, lucideListOrdered, lucideFileArchive, lucideFile, lucideCloudSync, lucideUser, lucideSettings, lucideLogOut, lucideWifi, lucideWifiOff } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmSwitchImports } from '@spartan-ng/helm/switch';
 import { Conexion } from '../../services/conexion';
@@ -9,9 +9,13 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { Auth } from '../../../auth/service/auth';
+
+import { BrnSheetImports } from '@spartan-ng/brain/sheet';
+import { HlmSheetImports } from '@spartan-ng/helm/sheet';
+
 @Component({
   selector: 'app-bottom-nav',
-  imports: [RouterLink, RouterLinkActive, FormsModule, NgIcon, ...HlmButtonImports, ...HlmSwitchImports],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, NgIcon, ...HlmButtonImports, ...HlmSwitchImports, ...BrnSheetImports, ...HlmSheetImports],
   templateUrl: './bottom-nav.html',
   styleUrl: './bottom-nav.css',
   providers: [
@@ -21,7 +25,13 @@ import { Auth } from '../../../auth/service/auth';
       lucideFile,
       lucideFileArchive,
       lucideContactRound,
-      lucideCloudSync
+      lucideCloudSync,
+      lucideListOrdered,
+      lucideUser,
+      lucideSettings,
+      lucideLogOut,
+      lucideWifi,
+      lucideWifiOff
     })
   ],
   host: {
@@ -32,15 +42,14 @@ export class BottomNav {
   isOnline: boolean = true;
   private networkSub!: Subscription;
 
-  private auth = inject(Auth);
-  private conexionService = inject(Conexion);
+  public auth = inject(Auth);
+  public conexionService = inject(Conexion);
   public estadoRed = signal(navigator.onLine ? 'Conectado' : 'Desconectado');
 
   protected readonly navItems = [
-    { label: 'Perfil', route: '/profile', icon: 'lucideContactRound' },
     { label: 'Clientes', route: '/clientes', icon: 'lucideUsers' },
-    { label: 'Sincronizar Doc.', route: '/sincronizar', icon: 'lucideCloudSync' },
     { label: 'Historial', route: '/historial', icon: 'lucideFile' },
+    { label: 'Inventario', route: '/inventario', icon: 'lucideListOrdered' },
   ];
 
   ngOnInit() {

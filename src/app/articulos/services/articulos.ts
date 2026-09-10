@@ -12,23 +12,27 @@ export class Articulos {
     private readonly http = inject(HttpClient);
     private readonly auth = inject(Auth);
 
-    getArticulos(): Observable<Articulo[]> {
-        const claveAgente = this.auth.currentAgente();
-        const claveUsuario = this.auth.currentUser();
-        const options = {
-            params: {
-                idUsuario: claveUsuario
-            }
-        }
-        return this.http.get<Articulo[]>(`${this.apiUrl}/${claveAgente}`, options);
+    getArticulos(page: number = 0, size: number = 10, search: string = ''): Observable<Page<Articulo>> {
+        return this.getAllArticulosByAlmacen(page, size, search);
     }
 
-  getAllArticulos(page: number, size: number = 10, search: string): Observable<Page<Articulo>> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString())
-      .set('search', search);
+    getAllArticulos(page: number, size: number = 10, search: string = ''): Observable<Page<Articulo>> {
+        const params = new HttpParams()
+            .set('page', page.toString())
+            .set('size', size.toString())
+            .set('search', search);
 
-    return this.http.get<Page<Articulo>>(`${this.apiUrl}`, { params });
-  }
+        return this.http.get<Page<Articulo>>(`${this.apiUrl}`, { params });
+    }
+
+    getAllArticulosByAlmacen(page: number, size: number = 10, search: string = ''): Observable<Page<Articulo>> {
+        const almacen = this.auth.currentAlmacen() ?? '';
+        const params = new HttpParams()
+            .set('almacen', almacen)
+            .set('page', page.toString())
+            .set('size', size.toString())
+            .set('search', search);
+
+        return this.http.get<Page<Articulo>>(`${this.apiUrl}/byAlmacen`, { params });
+    }
 }

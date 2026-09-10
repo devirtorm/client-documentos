@@ -20,7 +20,8 @@
       "@spartan-ng/helm/table": ["./libs/ui/table/src/index.ts"],
       "@spartan-ng/helm/badge": ["./libs/ui/badge/src/index.ts"],
       "@spartan-ng/helm/accordion": ["./libs/ui/accordion/src/index.ts"],
-      "@spartan-ng/helm/switch": ["./libs/ui/switch/src/index.ts"]
+      "@spartan-ng/helm/switch": ["./libs/ui/switch/src/index.ts"],
+      "@spartan-ng/helm/sheet": ["./libs/ui/sheet/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

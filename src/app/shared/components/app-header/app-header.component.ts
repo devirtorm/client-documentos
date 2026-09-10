@@ -11,7 +11,7 @@ import { ThemeService } from '../../services/theme.service';
   imports: [CommonModule, NgIcon, ...HlmButtonImports],
   providers: [provideIcons({ lucideArrowLeft, lucideMoon, lucideSun })],
   template: `
-    <header class="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border/60">
+    <header class="sticky top-0 z-30 bg-background/20 backdrop-blur-xl border-b-2 rounded-b-3xl border-border/60">
       <div class="flex items-center gap-3 px-4 pt-3 pb-2.5">
         <!-- Back Button Option -->
         @if (showBackBtn()) {

@@ -8,4 +8,5 @@ export interface AuthResponse {
   tokenType?: string;
   user?: string;
   agente?: string;
+  almacen?: string;
 }
