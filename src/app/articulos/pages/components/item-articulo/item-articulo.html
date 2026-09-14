@@ -60,37 +60,35 @@
                 <span>Agregar</span>
             </button>
             } @else {
-            <div class="flex flex-col items-end gap-0.5">
-                <div class="flex items-center gap-1">
+            <div class="flex flex-col items-end gap-1">
+                <div class="flex items-center rounded-xl border border-primary/40 bg-background shadow-xs p-0.5">
                     <button hlmBtn variant="ghost" size="sm"
-                        class="h-7 w-7 rounded-lg p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                        (click)="eliminar(); $event.stopPropagation()">
-                        <ng-icon name="lucideTrash2" size="14"></ng-icon>
+                        class="h-6 w-6 rounded-lg p-0 text-foreground hover:bg-muted"
+                        (click)="decrementar(); $event.stopPropagation()">
+                        <ng-icon name="lucideMinus" size="11"></ng-icon>
                     </button>
-                    
-                    <div class="flex items-center rounded-xl border border-primary/40 bg-background shadow-xs p-0.5">
-                        <button hlmBtn variant="ghost" size="sm"
-                            class="h-6 w-6 rounded-lg p-0 text-foreground hover:bg-muted"
-                            (click)="decrementar(); $event.stopPropagation()">
-                            <ng-icon name="lucideMinus" size="11"></ng-icon>
-                        </button>
 
-                        <input type="number" min="0"
-                            class="w-7 h-6 text-center text-xs font-bold bg-transparent focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-primary"
-                            [value]="cantidad()"
-                            (input)="onCantidadInput($event)"
-                            (click)="$event.stopPropagation()" />
+                    <input type="number" min="0"
+                        class="w-7 h-6 text-center text-xs font-bold bg-transparent focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-primary"
+                        [value]="cantidad()"
+                        (input)="onCantidadInput($event)"
+                        (click)="$event.stopPropagation()" />
 
-                        <button hlmBtn variant="ghost" size="sm"
-                            class="h-6 w-6 rounded-lg p-0 text-foreground hover:bg-muted"
-                            (click)="incrementar(); $event.stopPropagation()">
-                            <ng-icon name="lucidePlus" size="11"></ng-icon>
-                        </button>
-                    </div>
+                    <button hlmBtn variant="ghost" size="sm"
+                        class="h-6 w-6 rounded-lg p-0 text-foreground hover:bg-muted"
+                        (click)="incrementar(); $event.stopPropagation()">
+                        <ng-icon name="lucidePlus" size="11"></ng-icon>
+                    </button>
                 </div>
-                <span class="text-[10px] text-muted-foreground tabular-nums mt-0.5">
-                    {{ precioEfectivo() * cantidad() | currency:'$' }}
-                </span>
+                <div class="flex items-center justify-between w-full min-w-[76px] px-0.5">
+                    <button class="text-[10px] text-destructive/80 hover:text-destructive font-semibold" 
+                        (click)="eliminar(); $event.stopPropagation()">
+                        Quitar
+                    </button>
+                    <span class="text-[10px] text-muted-foreground tabular-nums">
+                        {{ precioEfectivo() * cantidad() | currency:'$' }}
+                    </span>
+                </div>
             </div>
             }
         </div>
