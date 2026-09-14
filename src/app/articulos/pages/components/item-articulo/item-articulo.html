@@ -56,11 +56,7 @@
             <button hlmBtn variant="outline" size="sm"
                 class="h-7 px-2.5 rounded-xl border-border/80 text-xs font-semibold gap-1 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-150"
                 (click)="incrementar(); $event.stopPropagation()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="M12 5v14" />
-                </svg>
+                <ng-icon name="lucideShoppingCart" size="12"></ng-icon>
                 <span>Agregar</span>
             </button>
             } @else {
@@ -69,10 +65,7 @@
                     <button hlmBtn variant="ghost" size="sm"
                         class="h-6 w-6 rounded-lg p-0 text-foreground hover:bg-muted"
                         (click)="decrementar(); $event.stopPropagation()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12h14" />
-                        </svg>
+                        <ng-icon name="lucideMinus" size="11"></ng-icon>
                     </button>
 
                     <input type="number" min="0"
@@ -84,11 +77,7 @@
                     <button hlmBtn variant="ghost" size="sm"
                         class="h-6 w-6 rounded-lg p-0 text-foreground hover:bg-muted"
                         (click)="incrementar(); $event.stopPropagation()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12h14" />
-                            <path d="M12 5v14" />
-                        </svg>
+                        <ng-icon name="lucidePlus" size="11"></ng-icon>
                     </button>
                 </div>
                 <span class="text-[10px] text-muted-foreground tabular-nums">

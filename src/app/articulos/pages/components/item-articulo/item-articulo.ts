@@ -3,6 +3,9 @@ import { Articulo } from '../../../interfaces/articulo';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
+import { NgIcon } from '@ng-icons/core';
+import { provideIcons } from '@ng-icons/core';
+import { lucideMinus, lucidePlus, lucideShoppingCart } from '@ng-icons/lucide';
 
 export interface ArticuloCantidad {
   articulo: Articulo;
@@ -11,7 +14,8 @@ export interface ArticuloCantidad {
 
 @Component({
   selector: 'app-item-articulo',
-  imports: [CurrencyPipe, DecimalPipe, ...HlmButtonImports, ...HlmInputImports],
+  imports: [CurrencyPipe, DecimalPipe, NgIcon, ...HlmButtonImports, ...HlmInputImports],
+  viewProviders: [provideIcons({ lucideMinus, lucidePlus, lucideShoppingCart })],
   templateUrl: './item-articulo.html',
 })
 export class ItemArticulo {
