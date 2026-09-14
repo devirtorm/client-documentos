@@ -5,7 +5,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { NgIcon } from '@ng-icons/core';
 import { provideIcons } from '@ng-icons/core';
-import { lucideMinus, lucidePlus, lucideShoppingCart } from '@ng-icons/lucide';
+import { lucideMinus, lucidePlus, lucideShoppingCart, lucideTrash2 } from '@ng-icons/lucide';
 
 export interface ArticuloCantidad {
   articulo: Articulo;
@@ -15,7 +15,7 @@ export interface ArticuloCantidad {
 @Component({
   selector: 'app-item-articulo',
   imports: [CurrencyPipe, DecimalPipe, NgIcon, ...HlmButtonImports, ...HlmInputImports],
-  viewProviders: [provideIcons({ lucideMinus, lucidePlus, lucideShoppingCart })],
+  viewProviders: [provideIcons({ lucideMinus, lucidePlus, lucideShoppingCart, lucideTrash2 })],
   templateUrl: './item-articulo.html',
 })
 export class ItemArticulo {
@@ -52,6 +52,11 @@ export class ItemArticulo {
       this.cantidad.update((v) => v - 1);
       this.emitCantidad();
     }
+  }
+
+  protected eliminar(): void {
+    this.cantidad.set(0);
+    this.emitCantidad();
   }
 
   protected onCantidadInput(event: Event): void {
