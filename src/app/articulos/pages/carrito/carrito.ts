@@ -56,6 +56,7 @@ export class Carrito {
     protected readonly items = signal<CarritoItem[]>([]);
     protected readonly isLoading = signal(true);
     protected readonly clienteDescuentos = signal({ d1: 0, d2: 0, d3: 0 });
+    protected readonly clienteNombre = signal<string>('');
 
     protected readonly totalItems = computed(() =>
         this.items().reduce((sum, item) => sum + item.cantidad, 0),
@@ -120,6 +121,7 @@ export class Carrito {
             }
         }
         if (cliente) {
+            this.clienteNombre.set(cliente.nombre);
             this.clienteDescuentos.set(this.pricingService.getDescuentosCliente(cliente));
         }
 

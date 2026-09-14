@@ -1,11 +1,16 @@
 <!-- Header -->
 <app-header title="Mi Pedido" [showBackBtn]="true" (back)="volver()">
-    <div subtitle-content class="text-[11px] text-muted-foreground mt-0.5">
-        @if (!isLoading() && !isEmpty()) {
-        {{ totalItems() }} artículo{{ totalItems() !== 1 ? 's' : '' }}
-        } @else if (!isLoading() && isEmpty()) {
-        Sin artículos
+    <div subtitle-content class="flex flex-col text-[11px] text-muted-foreground mt-0.5">
+        @if (clienteNombre()) {
+            <span class="font-medium text-foreground max-w-[200px] truncate">{{ clienteNombre() }}</span>
         }
+        <span>
+            @if (!isLoading() && !isEmpty()) {
+            {{ totalItems() }} artículo{{ totalItems() !== 1 ? 's' : '' }}
+            } @else if (!isLoading() && isEmpty()) {
+            Sin artículos
+            }
+        </span>
     </div>
 
     <!-- Botón limpiar todo -->
