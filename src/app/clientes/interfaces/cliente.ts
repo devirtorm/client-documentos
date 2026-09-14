@@ -7,6 +7,12 @@ export interface Cliente {
     esClienteBase?: string;
     email?: string;
     direccion?: string;
+    descuento1?: string;
+    descuento2?: string;
+    descuento3?: string;
+    listaPrecios?: string;
+    fechaInicialDescuentos?: string;
+    fechaFinalDescuentos?: string;
     extra1?: string;
     extra2?: string;
     extra3?: string;

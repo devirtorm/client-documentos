@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
     lucideArrowLeft,
@@ -18,10 +18,16 @@ import { CarritoItem } from '../../interfaces/carrito-item';
 import { Documento } from '../../interfaces/documento';
 import { Conexion } from '../../../shared/services/conexion';
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
+import { Documentos } from '../../../documentos/services/documentos';
+import { Clientes } from '../../../clientes/services/clientes';
+import { ClientesDB } from '../../../clientes/services/clientes-db';
+import { GenerarDocumentoRequest } from '../../../documentos/interfaces/documento';
+import { PricingService } from '../../../shared/services/pricing.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-carrito',
-    imports: [...HlmButtonImports, CurrencyPipe, NgIcon, AppHeaderComponent],
+    imports: [...HlmButtonImports, CurrencyPipe, DecimalPipe, NgIcon, AppHeaderComponent],
     templateUrl: './carrito.html',
     styleUrl: './carrito.css',
     providers: [
@@ -42,17 +48,49 @@ export class Carrito {
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     private conexionService = inject(Conexion);
+    private documentosService = inject(Documentos);
+    private clientesService = inject(Clientes);
+    private clientesDB = inject(ClientesDB);
+    private pricingService = inject(PricingService);
 
     protected readonly items = signal<CarritoItem[]>([]);
     protected readonly isLoading = signal(true);
+    protected readonly clienteDescuentos = signal({ d1: 0, d2: 0, d3: 0 });
 
     protected readonly totalItems = computed(() =>
         this.items().reduce((sum, item) => sum + item.cantidad, 0),
     );
 
-    protected readonly totalPrecio = computed(() =>
-        this.items().reduce((sum, item) => sum + item.articuloPrecio * item.cantidad, 0),
-    );
+    protected getItemPrecioNeto(item: CarritoItem): number {
+        const descsArt = {
+            d1: item.descuento1 || 0,
+            d2: item.descuento2 || 0,
+            d3: item.descuento3 || 0
+        };
+        const precioArt = this.pricingService.calcularPrecioConDescuento(item.articuloPrecio, descsArt);
+        return this.pricingService.calcularPrecioConDescuento(precioArt, this.clienteDescuentos());
+    }
+
+    protected getItemSubtotal(item: CarritoItem): number {
+        return Math.round(this.getItemPrecioNeto(item) * item.cantidad * 100) / 100;
+    }
+
+    protected readonly subtotalBase = computed(() => {
+        return this.items().reduce((sum, item) => sum + (item.articuloPrecio * item.cantidad), 0);
+    });
+
+    protected readonly totalPrecio = computed(() => {
+        let total = 0;
+        for (const item of this.items()) {
+            total += this.getItemSubtotal(item);
+        }
+        return Math.round(total * 100) / 100;
+    });
+
+    protected readonly totalDescuento = computed(() => {
+        const diff = this.subtotalBase() - this.totalPrecio();
+        return Math.max(0, Math.round(diff * 100) / 100);
+    });
 
     protected readonly isEmpty = computed(() => this.items().length === 0);
 
@@ -66,6 +104,23 @@ export class Carrito {
         if (!agenteId || !clienteId) {
             this.isLoading.set(false);
             return;
+        }
+
+        // Cargar descuentos del cliente usando la base de datos local (Dexie)
+        // o recurriendo a la API si no estaba en caché
+        let cliente = await this.clientesDB.getCliente(clienteId);
+        if (!cliente) {
+            try {
+                cliente = await firstValueFrom(this.clientesService.getCliente(clienteId));
+                if (cliente) {
+                    await this.clientesDB.guardarClientes([cliente]);
+                }
+            } catch (e) {
+                console.error('Error al obtener cliente en carrito:', e);
+            }
+        }
+        if (cliente) {
+            this.clienteDescuentos.set(this.pricingService.getDescuentosCliente(cliente));
         }
 
         const items = await this.carritoDB.getCarrito(agenteId, clienteId);
@@ -127,6 +182,7 @@ export class Carrito {
     }
 
     protected guardarDocumento(): void {
+        console.log('Guardando documento...');
         const agenteId = this.auth.currentAgente();
         const clienteId = this.route.snapshot.queryParamMap.get('cliente');
 
@@ -138,7 +194,42 @@ export class Carrito {
     }
 
     protected async guardarOnline(agenteId: string, clienteId: string): Promise<void> {
+        const almacen = this.auth.currentAlmacen() ?? '';
+        const request: GenerarDocumentoRequest = {
+            tipoDocumento: 'P', 
+            cliProv: clienteId,
+            agente: agenteId,
+            almacen: almacen,
+            claveMoneda: '001', 
+            descuento1: this.clienteDescuentos().d1,
+            descuento2: this.clienteDescuentos().d2,
+            descuento3: this.clienteDescuentos().d3,
+            detalles: this.items().map(item => ({
+                articulo: item.articuloClave,
+                descripcion: item.articuloDescripcion,
+                cantidad: item.cantidad,
+                precio: item.articuloPrecio,
+                descuento1: item.descuento1 || 0,
+                descuento2: item.descuento2 || 0,
+                descuento3: item.descuento3 || 0
+            }))
+        };
 
+        this.documentosService.generarDocumento(request).subscribe({
+            next: async (response) => {
+                if (response.success) {
+                    console.log('Pedido generado exitosamente:', response);
+                    await this.carritoDB.limpiarCarrito(agenteId, clienteId);
+                    this.items.set([]);
+                    this.volver(); 
+                } else {
+                    console.error('La API retornó error:', response.mensaje);
+                }
+            },
+            error: (err) => {
+                console.error('Error al generar el pedido online:', err);
+            }
+        });
     }
     protected async guardarOffline(agenteId: string, clienteId: string): Promise<void> {
         const now = new Date();

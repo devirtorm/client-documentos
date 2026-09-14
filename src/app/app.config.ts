@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -7,6 +7,7 @@ import { credentialsInterceptor } from './auth/interceptors/credentials-intercep
 import { Auth } from './auth/service/auth';
 
 import { ThemeService } from './shared/services/theme.service';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export function initializeApp(auth: Auth) {
   return () => auth.checkSession();
@@ -32,6 +33,9 @@ export const appConfig: ApplicationConfig = {
       useFactory: initializeTheme,
       deps: [ThemeService],
       multi: true
-    }
+    }, provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })
   ]
 };

@@ -6,7 +6,7 @@
                 <ng-icon name="lucideUser" class="size-5"></ng-icon>
                 <span class="tab-label">Perfil</span>
             </button>
-            <hlm-sheet-content *hlmSheetPortal="let ctx" class="data-[side=bottom]:max-h-[85vh] overflow-y-auto rounded-t-3xl p-6 flex flex-col">
+            <hlm-sheet-content *hlmSheetPortal="let ctx" class="data-[side=bottom]:max-h-[85vh] bg-background/90 overflow-y-auto rounded-t-3xl p-6 flex flex-col">
 
                 <!-- Handle -->
                 <div class="w-9 h-1 bg-muted-foreground/30 rounded-full mx-auto mb-5"></div>
@@ -25,7 +25,7 @@
                 </div>
 
                 <!-- Estado de conexión (Switch) -->
-                <div class="flex items-center gap-4 mb-8 px-5 py-4 bg-muted/50 rounded-2xl w-full">
+                <div class="flex items-center border gap-4 mb-8 px-5 py-4 bg-muted/50 rounded-2xl w-full">
                     <ng-icon [name]="isOnline ? 'lucideWifi' : 'lucideWifiOff'" 
                              [class]="isOnline ? 'text-green-600 w-6 h-6' : 'text-red-600 w-6 h-6'"></ng-icon>
                     <div class="flex flex-col flex-1">
@@ -69,7 +69,7 @@
 
                 <!-- Cerrar sesión -->
                 <div class="mt-auto">
-                    <button hlmBtn variant="destructive" class="w-full rounded-xl h-11" (click)="logout()">
+                    <button hlmBtn class="w-full rounded-xl h-11" (click)="logout()">
                         <ng-icon name="lucideLogOut" class="mr-2 w-4.5 h-4.5"></ng-icon>
                         Cerrar sesión
                     </button>

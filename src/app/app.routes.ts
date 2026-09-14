@@ -62,6 +62,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./sincronizacion-documento/pages/sincronizacion-documentos/sincronizacion-documentos').then(m => m.SincronizacionDocumentos)
             },
             {
+                path: 'inventario',
+                loadComponent: () => import('./inventario/pages/inventario/inventario').then(m => m.Inventario)
+            },
+            {
                 path: '',
                 redirectTo: 'clientes',
                 pathMatch: 'full'

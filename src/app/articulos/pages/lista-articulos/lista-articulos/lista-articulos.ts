@@ -1,5 +1,9 @@
 import { Component, computed, inject, Signal, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ClientesDB } from '../../../../clientes/services/clientes-db';
+import { Clientes } from '../../../../clientes/services/clientes';
+import { PricingService } from '../../../../shared/services/pricing.service';
+import { Cliente } from '../../../../clientes/interfaces/cliente';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { Articulo } from '../../../interfaces/articulo';
@@ -49,6 +53,10 @@ export class ListaArticulos {
   private auth = inject(Auth);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private clientesDB = inject(ClientesDB);
+  private clientesService = inject(Clientes);
+  private pricingService = inject(PricingService);
+  protected clienteSeleccionado = signal<Cliente | undefined>(undefined);
 
   constructor() {
     this.searchSubscription = this.searchSubject.pipe(
@@ -71,12 +79,30 @@ export class ListaArticulos {
   protected readonly totalPrecioCarrito = computed(() => {
     let total = 0;
     this.carrito().forEach((item) => {
-      total += (item.articulo.precio1 ?? 0) * item.cantidad;
+      total += this.getPrecioEfectivo(item.articulo) * item.cantidad;
     });
-    return total;
+    return Math.round(total * 100) / 100;
   });
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const clienteId = this.route.snapshot.queryParamMap.get('cliente');
+    if (clienteId) {
+      const local = await this.clientesDB.getCliente(clienteId);
+      if (local) {
+        this.clienteSeleccionado.set(local);
+      } else {
+        this.clientesService.getCliente(clienteId).subscribe({
+          next: (c) => {
+            if (c) {
+              this.clienteSeleccionado.set(c);
+              this.clientesDB.guardarClientes([c]);
+            }
+          },
+          error: (err) => console.error('Error cargando cliente:', err)
+        });
+      }
+    }
+    await this.cargarCarritoPersistido([]);
     this.cargarArticulos();
   }
 
@@ -84,11 +110,12 @@ export class ListaArticulos {
     this.isLoading.set(true);
     const query = this.searchQuery();
     this.articulosService.getAllArticulos(0, 10, query).subscribe({
-      next: (page) => {
+      next: async (page) => {
         this.articulos.set(page.content);
-        this.articulosCurrentPage.set(page.number);
-        this.articulosTotalPages.set(page.totalPages);
-        this.articulosTotalElements.set(page.totalElements);
+        this.articulosCurrentPage.set(page.page.number);
+        this.articulosTotalPages.set(page.page.totalPages);
+        this.articulosTotalElements.set(page.page.totalElements);
+        await this.cargarCarritoPersistido(page.content);
         this.isLoading.set(false);
       },
       error: () => { this.isLoading.set(false); }
@@ -101,19 +128,28 @@ export class ListaArticulos {
     if (!agenteId || !clienteId) return;
 
     const items = await this.carritoDB.getCarrito(agenteId, clienteId);
-    if (items.length === 0) return;
+    if (items.length === 0) {
+      this.carrito.set(new Map());
+      return;
+    }
 
     const articulosMap = new Map(articulos.map(a => [a.clave, a]));
-    const nuevoCarrito = new Map<string, ArticuloCantidad>();
+    const nuevoCarrito = new Map<string, ArticuloCantidad>(this.carrito());
 
     for (const item of items) {
-      const articulo = articulosMap.get(item.articuloClave);
-      if (articulo) {
-        nuevoCarrito.set(item.articuloClave, {
-          articulo,
-          cantidad: item.cantidad
-        });
-      }
+      const articulo = articulosMap.get(item.articuloClave) || {
+        clave: item.articuloClave,
+        descripcion: item.articuloDescripcion,
+        precio1: item.articuloPrecio,
+        descuento1: item.descuento1,
+        descuento2: item.descuento2,
+        descuento3: item.descuento3
+      };
+
+      nuevoCarrito.set(item.articuloClave, {
+        articulo,
+        cantidad: item.cantidad
+      });
     }
 
     this.carrito.set(nuevoCarrito);
@@ -156,14 +192,18 @@ export class ListaArticulos {
     if (event.cantidad === 0) {
       await this.carritoDB.eliminarItem(agenteId, clienteId, event.articulo.clave);
     } else {
+      const descsArticulo = this.pricingService.getDescuentosArticulo(event.articulo);
       await this.carritoDB.guardarItem({
         articuloClave: event.articulo.clave,
         articuloDescripcion: event.articulo.descripcion,
-        articuloPrecio: event.articulo.precio1 ?? 0,
+        articuloPrecio: this.pricingService.getPrecioBaseArticulo(event.articulo, this.clienteSeleccionado()),
         cantidad: event.cantidad,
         agenteId,
         clienteClave: clienteId,
         fechaAgregado: new Date().toISOString(),
+        descuento1: descsArticulo.d1,
+        descuento2: descsArticulo.d2,
+        descuento3: descsArticulo.d3
       });
     }
   }
@@ -192,10 +232,11 @@ export class ListaArticulos {
       const nextPage = this.articulosCurrentPage() + 1;
       const query = this.searchQuery();
       this.articulosService.getAllArticulos(nextPage, 10, query).subscribe({
-          next: (page) => {
+          next: async (page) => {
               this.articulos.update((current) => [...current, ...page.content]);
-              this.articulosCurrentPage.set(page.number);
-              this.articulosTotalPages.set(page.totalPages);
+              this.articulosCurrentPage.set(page.page.number);
+              this.articulosTotalPages.set(page.page.totalPages);
+              await this.cargarCarritoPersistido(page.content);
               this.isLoadingMore.set(false);
           },
           error: () => {
@@ -204,4 +245,12 @@ export class ListaArticulos {
       });
   }
 
+
+  protected getPrecioBase(articulo: Articulo): number {
+    return this.pricingService.getPrecioBaseArticulo(articulo, this.clienteSeleccionado());
+  }
+
+  protected getPrecioEfectivo(articulo: Articulo): number {
+    return this.pricingService.getPrecioEfectivoArticulo(articulo, this.clienteSeleccionado());
+  }
 }

@@ -1,6 +1,6 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, effect, input, output, signal } from '@angular/core';
 import { Articulo } from '../../../interfaces/articulo';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 
@@ -11,18 +11,22 @@ export interface ArticuloCantidad {
 
 @Component({
   selector: 'app-item-articulo',
-  imports: [CurrencyPipe, ...HlmButtonImports, ...HlmInputImports],
+  imports: [CurrencyPipe, DecimalPipe, ...HlmButtonImports, ...HlmInputImports],
   templateUrl: './item-articulo.html',
 })
 export class ItemArticulo {
   articulo = input.required<Articulo>();
   cantidadInicial = input<number>(0);
+  precioBase = input<number>(0);
+  precioEfectivo = input<number>(0);
   cantidadChange = output<ArticuloCantidad>();
 
   protected cantidad = signal(0);
 
-  ngOnInit(): void {
-    this.cantidad.set(this.cantidadInicial());
+  constructor() {
+    effect(() => {
+      this.cantidad.set(this.cantidadInicial());
+    });
   }
 
   protected getInitials(descripcion: string): string {

@@ -1,87 +1,93 @@
 <!-- Card de remisión -->
-<div class="remision-card" [class.expanded]="expanded" [attr.id]="'documento-' + documento().folio">
+<div
+    class="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-800/60 backdrop-blur-xl overflow-hidden"
+    [class.ring-1]="expanded"
+    [class.ring-black/10]="expanded"
+    [class.dark:ring-white/10]="expanded"
+    [attr.id]="'documento-' + documento().folio"
+>
 
     <!-- Header clickeable -->
-    <button class="card-header" (click)="toggle()" [attr.aria-expanded]="expanded">
+    <button
+        class="w-full flex items-center justify-between gap-2 px-2.5 py-3 text-left transition-colors active:bg-black/5 dark:active:bg-white/5"
+        (click)="toggle()"
+        [attr.aria-expanded]="expanded"
+    >
         <!-- Icono + Folio -->
-        <div class="header-left">
-            <div class="folio-icon">
-                <ng-icon name="lucidePackage" size="16" />
+        <div class="flex items-center gap-2 min-w-0">
+            <div class="shrink-0 flex items-center justify-center w-7 h-7 rounded-md bg-black/5 dark:bg-white/10 text-neutral-700 dark:text-white">
+                <ng-icon name="lucidePackage" size="13" />
             </div>
-            <div class="header-info">
-                <div class="folio-row">
-                    <span class="folio-text">{{ documento().folio }}</span>
-                    <span hlmBadge [variant]="getStatusVariant()" class="status-badge">
+            <div class="flex flex-col min-w-0">
+                <div class="flex items-center gap-1.5">
+                    <span class="font-semibold text-neutral-900 dark:text-white text-xs truncate">{{ documento().folio }}</span>
+                    <span hlmBadge [variant]="getStatusVariant()" class="text-[9px] leading-none px-1 py-0.5 shrink-0">
                         {{ documento().status }}
                     </span>
                 </div>
-                <div class="meta-row">
-                    <span class="meta-item">
-                        <ng-icon name="lucideCalendar" size="10" />
-                        {{ documento().fecha | date:'dd/MM/yyyy' }}
+                <div class="flex items-center gap-1 text-[10px] text-neutral-500 dark:text-white/50">
+                    <span class="flex items-center gap-0.5">
+                        <ng-icon name="lucideCalendar" size="9" />
+                        {{ documento().fecha | date:'dd/MM/yy' }}
                     </span>
-                    <span class="meta-separator"></span>
-                    <span class="meta-item">
-                        <ng-icon name="lucideUser" size="10" />
-                        {{ documento().cliProv }}
-                    </span>
+                    <span class="w-0.5 h-0.5 rounded-full bg-neutral-400 dark:bg-white/30 shrink-0"></span>
+                    <span class="truncate">{{ documento().cliProv }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Importe + Chevron -->
-        <div class="header-right">
-            <span class="importe">{{ documento().total | currency:'$' }}</span>
-            <ng-icon name="lucideChevronDown" size="16" class="chevron-icon" [class.rotated]="expanded" />
+        <div class="flex items-center gap-1.5 shrink-0">
+            <span class="font-semibold text-neutral-900 dark:text-white text-xs tabular-nums">{{ documento().total | currency:'$' }}</span>
+            <ng-icon
+                name="lucideChevronDown"
+                size="14"
+                class="text-neutral-400 dark:text-white/60 transition-transform duration-200"
+                [class.rotate-180]="expanded"
+            />
         </div>
     </button>
 
-    <!-- Panel de detalles expandible -->
+    <!-- Panel de detalles tipo ticket -->
     @if (expanded) {
-    <div class="details-panel">
-        <div class="details-header">
-            <span class="details-title">Artículos ({{ documento().detalles?.length ?? 0 }})</span>
+    <div class="px-2.5 pb-2.5 pt-2 border-t border-dashed border-black/15 dark:border-white/20 bg-black/[0.02] dark:bg-white/[0.02] font-mono">
+
+        <!-- Header ticket -->
+        <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-bold text-neutral-500 dark:text-white/70 tracking-widest uppercase">Artículos</span>
+            <span class="text-[10px] text-neutral-400 dark:text-white/40">x{{ documento().detalles?.length ?? 0 }}</span>
         </div>
 
-        <!-- Tabla de detalles con Spartan Table -->
-        <div hlmTableContainer class="details-table-container">
-            <table hlmTable class="details-table">
-                <thead hlmTHead>
-                    <tr hlmTr>
-                        <th hlmTh class="col-articulo">Artículo</th>
-                        <th hlmTh class="col-qty">Cant.</th>
-                        <th hlmTh class="col-precio">Precio</th>
-                        <th hlmTh class="col-importe">Importe</th>
-                    </tr>
-                </thead>
-                <tbody hlmTBody>
-                    @for (detalle of documento().detalles; track detalle.consecutivo) {
-                    <tr hlmTr>
-                        <td hlmTd class="col-articulo">
-                            <div class="articulo-cell">
-                                <span class="articulo-code">{{ detalle.articulo }}</span>
-                                <span class="articulo-desc">{{ detalle.descripcion }}</span>
-                            </div>
-                        </td>
-                        <td hlmTd class="col-qty">{{ detalle.cantidad | number:'1.0-2' }}</td>
-                        <td hlmTd class="col-precio">{{ detalle.precio | currency:'$' }}</td>
-                        <td hlmTd class="col-importe">{{ detalle.importeTotal | currency:'$' }}</td>
-                    </tr>
-                    } @empty {
-                    <tr hlmTr>
-                        <td hlmTd colspan="4" class="empty-details">
-                            Sin detalles disponibles
-                        </td>
-                    </tr>
-                    }
-                </tbody>
-            </table>
+        <!-- Líneas de artículos -->
+        @if (documento().detalles?.length) {
+        <div class="flex flex-col gap-1.5">
+            @for (detalle of documento().detalles; track detalle.consecutivo) {
+            <div>
+                <div class="flex items-baseline justify-between gap-2">
+                    <span class="text-[11px] font-semibold text-neutral-900 dark:text-white truncate">{{ detalle.articulo }}</span>
+                    <span class="text-[11px] font-semibold text-neutral-900 dark:text-white tabular-nums shrink-0">
+                        {{ detalle.importeTotal | currency:'$' }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-[9px] text-neutral-400 dark:text-white/40 truncate">{{ detalle.descripcion }}</span>
+                    <span class="text-[9px] text-neutral-400 dark:text-white/40 tabular-nums shrink-0">
+                        {{ detalle.cantidad | number:'1.0-2' }} x {{ detalle.precio | currency:'$' }}
+                    </span>
+                </div>
+            </div>
+            }
         </div>
+        } @else {
+        <div class="py-4 text-center text-[10px] text-neutral-400 dark:text-white/40 italic">
+            Sin detalles disponibles
+        </div>
+        }
 
-        <!-- Footer con total -->
-        <div class="details-footer">
-            <span class="total-label">Total</span>
-            <span class="total-value">{{ documento().total | currency:'$' }}</span>
+        <!-- Total -->
+        <div class="border-t-2 border-double border-black/25 dark:border-white/30 mt-2 pt-1.5 flex items-center justify-between">
+            <span class="text-[11px] font-bold text-neutral-600 dark:text-white/80 tracking-widest uppercase">Total</span>
+            <span class="text-sm font-bold text-neutral-900 dark:text-white tabular-nums">{{ documento().total | currency:'$' }}</span>
         </div>
     </div>
     }

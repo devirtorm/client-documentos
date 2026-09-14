@@ -1,94 +1,100 @@
-<details
-    class="group rounded-2xl border border-border/70 bg-card overflow-hidden transition-all duration-200 hover:border-primary/40"
+<details class="group transition-colors hover:bg-muted/20"
     [attr.id]="'doc-' + item().folio">
 
-    <!-- Summary -->
+    <!-- Fila principal (Summary estilo Uber) -->
     <summary
-        class="flex items-center gap-3 p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-colors duration-150 hover:bg-muted/30">
+        class="flex items-center gap-3 px-4 py-2.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden transition-colors">
 
-        <!-- Info Principal -->
+        <!-- Icono de estado / avatar -->
+        <div class="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors shadow-2xs"
+            [class]="item().estatus === 'error' 
+                ? 'bg-red-500/10 text-red-600 dark:text-red-400' 
+                : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'">
+            @if (item().estatus === 'error') {
+                <ng-icon name="lucideAlertCircle" size="18"></ng-icon>
+            } @else {
+                <ng-icon name="lucideFileText" size="18"></ng-icon>
+            }
+        </div>
+
+        <!-- Info Principal (Centro) -->
         <div class="flex-1 min-w-0">
-            <p class="text-[15px] font-semibold text-foreground leading-snug line-clamp-1 group-hover:text-primary transition-colors duration-200">
-                {{ item().clienteId }}
-            </p>
-            <div class="flex items-center gap-2 mt-1">
-                <span class="inline-flex items-center text-[11px] font-mono font-medium text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
-                    {{ item().folio }}
+            <div class="flex items-center gap-1.5">
+                <p class="text-[13px] font-semibold text-foreground truncate">
+                    {{ item().clienteId }}
+                </p>
+                <span class="inline-flex items-center gap-1 text-[9px] font-semibold uppercase px-1.5 py-0.2 rounded"
+                    [class]="item().estatus === 'error'
+                        ? 'text-red-600 bg-red-500/10'
+                        : 'text-amber-600 bg-amber-500/10'">
+                    <span class="w-1.5 h-1.5 rounded-full"
+                          [class]="item().estatus === 'error' ? 'bg-red-500' : 'bg-amber-500'"></span>
+                    {{ item().estatus }}
                 </span>
-                <span class="text-muted-foreground/30">·</span>
-                <span class="text-[12px] text-muted-foreground font-medium">
-                    {{ item().fecha | date:'shortDate' }}
-                </span>
+            </div>
+
+            <div class="flex items-center gap-1 mt-0.5 text-[11px] text-muted-foreground flex-wrap">
+                <span class="font-mono bg-muted/60 px-1 py-0.2 rounded text-[10px]">{{ item().folio }}</span>
+                <span>·</span>
+                <span>{{ item().items.length }} {{ item().items.length === 1 ? 'art.' : 'arts.' }}</span>
+                <span>·</span>
+                <span>{{ item().fecha | date:'shortDate' }}</span>
+                <span>·</span>
+                <span class="font-bold text-foreground tabular-nums">{{ item().total | currency:'$' }}</span>
             </div>
         </div>
 
-        <!-- Total y Estatus -->
-        <div class="flex flex-col items-end gap-1 shrink-0">
-            <span class="text-[15px] font-bold text-foreground tabular-nums">
-                {{ item().total | currency:'$' }}
-            </span>
-            <span
-                class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider"
-                [class]="item().estatus === 'error'
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-amber-600 dark:text-amber-400'">
-                <span class="w-1.5 h-1.5 rounded-full"
-                      [class]="item().estatus === 'error' ? 'bg-red-500' : 'bg-amber-500'"></span>
-                {{ item().estatus }}
-            </span>
-        </div>
+        <!-- Acciones directas a la derecha -->
+        <div class="shrink-0 flex items-center gap-1.5" (click)="$event.stopPropagation()">
+            <button hlmBtn variant="default" size="sm" [disabled]="isSyncing()"
+                class="h-7 px-2.5 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 gap-1 shadow-2xs"
+                (click)="onSincronizar()">
+                @if (isSyncing()) {
+                    <ng-icon name="lucideLoader2" class="animate-spin" size="12"></ng-icon>
+                    <span class="hidden sm:inline">Enviando...</span>
+                } @else {
+                    <ng-icon name="lucideRefreshCw" size="11"></ng-icon>
+                }
+            </button>
 
-        <!-- Chevron -->
-        <div class="ml-1 text-muted-foreground/40 transition-transform duration-200 group-open:rotate-180 group-hover:text-primary">
-            <ng-icon name="lucideChevronDown" size="18"></ng-icon>
+            <!-- Chevron para desplegar detalles -->
+            <div class="h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground/60 transition-transform duration-200 group-open:rotate-180">
+                <ng-icon name="lucideChevronDown" size="15"></ng-icon>
+            </div>
         </div>
     </summary>
 
-    <!-- Contenido expandido -->
-    <div class="border-t border-border/40 bg-muted/10 px-4 py-4">
-
-        <!-- Artículos -->
-        <div class="mb-4">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Artículos
-                </span>
-                <span class="text-[12px] font-medium text-muted-foreground">
-                    {{ item().items.length }} {{ item().items.length === 1 ? 'producto' : 'productos' }}
-                </span>
-            </div>
-
-            <div class="flex flex-col gap-2">
-                @for (articulo of item().items; track articulo.articuloClave) {
-                <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-background border border-border/40 hover:border-border/60 transition-colors duration-200">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[13px] font-medium text-foreground line-clamp-1 leading-snug">
-                            {{ articulo.articuloDescripcion }}
-                        </p>
-                        <div class="flex items-center gap-1.5 mt-1 text-[11px] text-muted-foreground">
-                            <span class="font-mono bg-muted px-1.5 py-0.5 rounded-md">{{ articulo.articuloClave }}</span>
-                            <span class="text-muted-foreground/30">·</span>
-                            <span class="font-medium">{{ articulo.cantidad }} × {{ articulo.articuloPrecio | currency:'$' }}</span>
-                        </div>
-                    </div>
-                    <span class="text-[13px] font-bold tabular-nums text-foreground shrink-0">
-                        {{ articulo.cantidad * articulo.articuloPrecio | currency:'$' }}
-                    </span>
-                </div>
-                }
-            </div>
+    <!-- Contenido expandido (desglose compacto) -->
+    <div class="border-t border-border/30 bg-muted/15 px-4 py-3">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                Detalle de artículos ({{ item().items.length }})
+            </span>
+            <button hlmBtn variant="ghost" size="sm" [disabled]="isSyncing()"
+                class="h-6 px-2 text-[11px] font-medium text-destructive hover:bg-destructive/10 rounded-md gap-1"
+                (click)="onDescartar()">
+                <ng-icon name="lucideTrash2" size="12"></ng-icon>
+                <span>Descartar pedido</span>
+            </button>
         </div>
 
-        <!-- Acciones -->
-        <div class="flex gap-3 pt-4 border-t border-border/40">
-            <button hlmBtn variant="outline" size="sm"
-                class="flex-1 rounded-xl h-10 text-[13px] font-semibold" (click)="onDescartar()">
-                Descartar
-            </button>
-            <button hlmBtn variant="default" size="sm"
-                class="flex-1 rounded-xl h-10 text-[13px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90" (click)="onSincronizar()">
-                Sincronizar
-            </button>
+        <div class="flex flex-col divide-y divide-border/30 rounded-xl border border-border/40 bg-background overflow-hidden shadow-2xs">
+            @for (articulo of item().items; track articulo.articuloClave) {
+            <div class="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+                <div class="flex-1 min-w-0">
+                    <p class="font-medium text-foreground truncate">
+                        {{ articulo.articuloDescripcion }}
+                    </p>
+                    <p class="text-[10px] text-muted-foreground mt-0.5">
+                        <span class="font-mono">{{ articulo.articuloClave }}</span>
+                        · {{ articulo.cantidad }} × {{ articulo.articuloPrecio | currency:'$' }}
+                    </p>
+                </div>
+                <span class="font-bold tabular-nums text-foreground shrink-0">
+                    {{ articulo.cantidad * articulo.articuloPrecio | currency:'$' }}
+                </span>
+            </div>
+            }
         </div>
     </div>
 </details>

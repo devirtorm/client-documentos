@@ -1,17 +1,26 @@
 <!-- Header -->
-<app-sincronizacion-header [count]="items().length"></app-sincronizacion-header>
+<app-sincronizacion-header 
+    [count]="items().length" 
+    [isSyncing]="isSyncingAll()"
+    (sincronizarTodo)="onSincronizarTodo()">
+</app-sincronizacion-header>
 
 <!-- Contenido -->
-<main class="pb-32">
+<main class="pb-32 pt-3 px-3">
     @if (isLoading()) {
     <app-sincronizacion-skeleton></app-sincronizacion-skeleton>
     } @else if (isEmpty()) {
     <app-sincronizacion-empty-state></app-sincronizacion-empty-state>
     } @else {
-    <!-- Lista de documentos -->
-    <div class="flex flex-col gap-3 px-4 pt-4">
+    <!-- Lista agrupada y redondeada en armonía con el header y bottombar -->
+    <div class="rounded-2xl border border-border/70 bg-card overflow-hidden divide-y divide-border/40 shadow-xs">
         @for (item of items(); track item.id) {
-        <app-sincronizacion-item [item]="item" (descartar)="onDescartarItem($event.id!)"></app-sincronizacion-item>
+        <app-sincronizacion-item 
+            [item]="item" 
+            [isSyncing]="syncingDocId() === item.id || isSyncingAll()"
+            (descartar)="onDescartarItem($event.id!)"
+            (sincronizar)="onSincronizarIndividual($event)">
+        </app-sincronizacion-item>
         }
     </div>
     }

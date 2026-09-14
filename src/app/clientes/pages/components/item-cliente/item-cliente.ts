@@ -1,7 +1,7 @@
 import { Component, inject, input, output } from '@angular/core';
 import { Cliente } from '../../../interfaces/cliente';
 import { NgIcon, provideIcons } from "@ng-icons/core";
-import { lucideTrash, lucidePencil } from '@ng-icons/lucide';
+import { lucideTrash, lucidePencil, lucideMapPin, lucidePhone } from '@ng-icons/lucide';
 import { Router, RouterLink } from '@angular/router';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { CommonModule } from '@angular/common';
@@ -13,7 +13,9 @@ import { CommonModule } from '@angular/common';
   providers: [
     provideIcons({
       lucideTrash,
-      lucidePencil
+      lucidePencil,
+      lucideMapPin,
+      lucidePhone
     })
   ]
 })

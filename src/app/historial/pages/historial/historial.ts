@@ -123,9 +123,9 @@ export class Historial implements OnDestroy {
         this.remisionesService.getHistorialByAgente(0, 10, query).subscribe({
             next: (page) => {
                 this.remisiones.set(page.content);
-                this.currentPage.set(page.number);
-                this.totalPages.set(page.totalPages);
-                this.totalElements.set(page.totalElements);
+                this.currentPage.set(page.page.number);
+                this.totalPages.set(page.page.totalPages);
+                this.totalElements.set(page.page.totalElements);
                 this.isLoading.set(false);
             },
             error: () => {
@@ -140,9 +140,9 @@ export class Historial implements OnDestroy {
         this.pedidosService.getHistorialByAgente(0, 10, query).subscribe({
             next: (page) => {
                 this.pedidos.set(page.content);
-                this.pedidosCurrentPage.set(page.number);
-                this.pedidosTotalPages.set(page.totalPages);
-                this.pedidosTotalElements.set(page.totalElements);
+                this.pedidosCurrentPage.set(page.page.number);
+                this.pedidosTotalPages.set(page.page.totalPages);
+                this.pedidosTotalElements.set(page.page.totalElements);
                 this.isLoading.set(false);
             },
             error: () => {
@@ -160,8 +160,8 @@ export class Historial implements OnDestroy {
         this.remisionesService.getHistorialByAgente(nextPage, 10, query).subscribe({
             next: (page) => {
                 this.remisiones.update((current) => [...current, ...page.content]);
-                this.currentPage.set(page.number);
-                this.totalPages.set(page.totalPages);
+                this.currentPage.set(page.page.number);
+                this.totalPages.set(page.page.totalPages);
                 this.isLoadingMore.set(false);
             },
             error: () => {
@@ -179,8 +179,8 @@ export class Historial implements OnDestroy {
         this.pedidosService.getHistorialByAgente(nextPage, 10, query).subscribe({
             next: (page) => {
                 this.pedidos.update((current) => [...current, ...page.content]);
-                this.pedidosCurrentPage.set(page.number);
-                this.pedidosTotalPages.set(page.totalPages);
+                this.pedidosCurrentPage.set(page.page.number);
+                this.pedidosTotalPages.set(page.page.totalPages);
                 this.isLoadingMore.set(false);
             },
             error: () => {

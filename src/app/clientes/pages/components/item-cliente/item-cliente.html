@@ -1,37 +1,39 @@
 <li class="px-3 py-1" [attr.id]="'cliente-' + cliente().clave">
     <a [routerLink]="['/articulos']" [queryParams]="{ cliente: cliente().clave }"
-        class="flex items-center gap-3 rounded-2xl border border-border/70 bg-card p-3 transition-all duration-200 hover:border-primary/30 hover:shadow-sm hover:shadow-primary/10 no-underline group cursor-pointer">
+        class="flex items-center gap-2 rounded-xl border border-border/70 bg-card px-2.5 py-2 transition-all duration-200 hover:border-primary/30 hover:shadow-sm hover:shadow-primary/10 no-underline group cursor-pointer">
 
         <!-- Avatar con iniciales -->
-        <div class="w-9.5 h-9.5 rounded-[11px] flex items-center justify-center shrink-0 text-sm font-medium"
+        <div class="shrink-0 flex items-center justify-center w-7 h-7 rounded-2xl text-xs font-medium"
              [ngClass]="cliente().esClienteBase ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'">
             {{ getInitials(cliente()!.nombre) }}
         </div>
 
         <!-- Info -->
-        <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-foreground truncate">
-                {{ cliente()!.nombre }}
-            </p>
-            <div class="flex items-center gap-1.5 mt-1 flex-wrap">
-                <span class="text-[11px] font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
-                    {{ cliente()!.clave }}
+        <div class="flex-1 min-w-0 flex flex-col">
+            <div class="flex items-center gap-1.5 min-w-0">
+                <span class="text-xs font-semibold text-foreground truncate">
+                    {{ cliente()!.nombre }}
                 </span>
+                @if (cliente().esClienteBase) {
+                <span class="text-[9px] leading-none text-muted-foreground bg-muted px-1 py-0.5 rounded shrink-0">
+                    Base
+                </span>
+                }
+            </div>
+            <div class="flex items-center gap-1 text-[10px] text-muted-foreground min-w-0">
+                <span class="font-mono shrink-0">{{ cliente()!.clave }}</span>
                 @if (cliente()!.ciudad) {
-                <span class="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <ng-icon name="lucideMapPin" size="12"></ng-icon>
+                <span class="w-0.5 h-0.5 rounded-full bg-muted-foreground/40 shrink-0"></span>
+                <span class="flex items-center gap-0.5 truncate">
+                    <ng-icon name="lucideMapPin" size="9"></ng-icon>
                     {{ cliente()!.ciudad }}
                 </span>
                 }
                 @if (cliente()!.telefono) {
-                <span class="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <ng-icon name="lucidePhone" size="12"></ng-icon>
+                <span class="w-0.5 h-0.5 rounded-full bg-muted-foreground/40 shrink-0"></span>
+                <span class="flex items-center gap-0.5 truncate">
+                    <ng-icon name="lucidePhone" size="9"></ng-icon>
                     {{ cliente()!.telefono }}
-                </span>
-                }
-                @if (cliente().esClienteBase) {
-                <span class="text-[11px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-md">
-                    Cliente base
                 </span>
                 }
             </div>
@@ -41,15 +43,15 @@
         @if (!cliente().esClienteBase) {
         <div class="shrink-0 flex items-center gap-0.5">
             <button hlmBtn variant="ghost" size="sm"
-                class="h-8 w-8 rounded-lg p-0 text-muted-foreground hover:text-foreground"
+                class="h-7 w-7 rounded-md p-0 text-muted-foreground hover:text-foreground"
                 aria-label="Editar cliente" (click)="$event.preventDefault(); $event.stopPropagation(); onEdit()">
-                <ng-icon name="lucidePencil" size="16"></ng-icon>
+                <ng-icon name="lucidePencil" size="14"></ng-icon>
             </button>
             <button hlmBtn variant="ghost" size="sm"
-                class="h-8 w-8 rounded-lg p-0 text-muted-foreground hover:text-red-500"
+                class="h-7 w-7 rounded-md p-0 text-muted-foreground hover:text-red-500"
                 aria-label="Eliminar cliente"
                 (click)="$event.preventDefault(); $event.stopPropagation(); onDelete()">
-                <ng-icon name="lucideTrash" size="16"></ng-icon>
+                <ng-icon name="lucideTrash" size="14"></ng-icon>
             </button>
         </div>
         }

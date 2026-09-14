@@ -95,25 +95,27 @@
 </app-header>
 
 <!-- Lista de artículos -->
-<main class="pb-24 pt-2">
+<main class="pb-24 pt-3 px-3">
     <!-- Skeleton loading -->
     @if (isLoading()) {
-    <ul class="flex flex-col">
+    <ul class="flex flex-col divide-y divide-border/40 rounded-2xl border border-border/70 bg-card overflow-hidden animate-pulse">
         @for (i of [1,2,3,4,5,6]; track i) {
-        <li class="flex items-center gap-3 px-4 py-3 border-b border-border/40">
-            <div class="w-10 h-10 rounded-xl bg-muted animate-pulse shrink-0"></div>
+        <li class="flex items-center gap-3 px-4 py-3">
+            <div class="w-10 h-10 rounded-xl bg-muted shrink-0"></div>
             <div class="flex-1 flex flex-col gap-1.5">
-                <div class="h-3.5 rounded-full bg-muted animate-pulse w-3/4"></div>
-                <div class="h-3 rounded-full bg-muted animate-pulse w-1/2"></div>
+                <div class="h-3.5 rounded-full bg-muted w-3/4"></div>
+                <div class="h-3 rounded-full bg-muted w-1/2"></div>
             </div>
-            <div class="h-8 w-16 rounded-xl bg-muted animate-pulse shrink-0"></div>
+            <div class="h-8 w-16 rounded-xl bg-muted shrink-0"></div>
         </li>
         }
     </ul>
     } @else {
-    <ul class="flex flex-col">
+    <ul class="flex flex-col divide-y divide-border/40 rounded-2xl border border-border/70 bg-card overflow-hidden shadow-xs">
         @for (articulo of articulos(); track articulo.clave) {
         <app-item-articulo [articulo]="articulo" [cantidadInicial]="getCantidad(articulo.clave)"
+            [precioBase]="getPrecioBase(articulo)"
+            [precioEfectivo]="getPrecioEfectivo(articulo)"
             (cantidadChange)="onCantidadChange($event)" />
         } @empty {
         <li class="flex flex-col items-center justify-center py-20 text-center px-6">
@@ -125,9 +127,11 @@
                 Intenta con otro término.</p>
         </li>
         }
+    </ul>
+    }
         <!-- Load more -->
         @if (hasMoreArticulos()) {
-        <div class="load-more-container">
+        <div class="load-more-container py-3">
             <button hlmBtn variant="outline" size="sm" class="rounded-lg text-xs gap-1.5" (click)="loadMoreArticulos()"
                 [disabled]="isLoadingMore()">
                 @if (isLoadingMore()) {
@@ -140,8 +144,6 @@
             </button>
         </div>
         }
-    </ul>
-    }
 </main>
 
 <!-- Botón flotante de carrito -->

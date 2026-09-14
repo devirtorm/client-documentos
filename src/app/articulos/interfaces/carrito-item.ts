@@ -6,4 +6,7 @@ export interface CarritoItem {
     agenteId: string;
     clienteClave: string;
     fechaAgregado: string;
+    descuento1: number;
+    descuento2: number;
+    descuento3: number;
 }

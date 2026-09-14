@@ -66,46 +66,36 @@
                 <div class="flex gap-1.5 mt-1.5">
                     <button hlmBtn [variant]="ordenSeleccionado() === 'nombre' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('nombre')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="mr-1">
-                            <path d="m3 16 4 4 4-4" />
-                            <path d="M7 20V4" />
-                            <path d="M11 4h4" />
-                            <path d="M11 8h7" />
-                            <path d="M11 12h10" />
-                        </svg>
+                        @if (ordenSeleccionado() === 'nombre' && ordenDireccion() === 'desc') {
+                        <ng-icon name="lucideArrowUpZA" size="12" class="mr-1" />
+                        } @else {
+                        <ng-icon name="lucideArrowDownAZ" size="12" class="mr-1" />
+                        }
                         Nombre
                     </button>
                     <button hlmBtn [variant]="ordenSeleccionado() === 'codigo' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('codigo')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="mr-1">
-                            <path d="m3 8 4-4 4 4" />
-                            <path d="M7 4v16" />
-                            <rect x="15" y="4" width="4" height="6" ry="2" />
-                            <path d="M17 20v-6h-2" />
-                            <path d="M15 20h4" />
-                        </svg>
+                        @if (ordenSeleccionado() === 'codigo' && ordenDireccion() === 'desc') {
+                        <ng-icon name="lucideArrowUpZA" size="12" class="mr-1" />
+                        } @else {
+                        <ng-icon name="lucideArrowDown10" size="12" class="mr-1" />
+                        }
                         Código
                     </button>
                     <button hlmBtn [variant]="ordenSeleccionado() === 'zona' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('zona')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="mr-1">
-                            <path
-                                d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
-                            <circle cx="12" cy="10" r="3" />
-                        </svg>
+                        @if (ordenSeleccionado() === 'zona' && ordenDireccion() === 'desc') {
+                        <ng-icon name="lucideArrowUpZA" size="12" class="mr-1" />
+                        } @else {
+                        <ng-icon name="lucideArrowDownAZ" size="12" class="mr-1" />
+                        }
                         Zona
                     </button>
                 </div>
             </div>
 
             <!-- Filtrar por zona -->
-            <div>
+            <div class="mb-2">
                 <span class="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Zona</span>
                 <div class="flex gap-1.5 mt-1.5 overflow-x-auto pb-1 scrollbar-hide -mr-4 pr-4">
                     @for (zona of zonas(); track zona) {
@@ -116,18 +106,46 @@
                     }
                 </div>
             </div>
+
+            <!-- Filtrar por día de revisión -->
+            <div>
+                <span class="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Día de revisión</span>
+                <div class="flex gap-1.5 mt-1.5 overflow-x-auto pb-1 scrollbar-hide -mr-4 pr-4">
+                    @for (dia of diasRevision(); track dia) {
+                    <button hlmBtn [variant]="diaRevisionSeleccionado() === dia.toLowerCase() ? 'default' : 'outline'"
+                        size="sm" class="rounded-full text-xs h-7 px-3 shrink-0" (click)="setDiaRevision(dia)">
+                        {{ dia }}
+                    </button>
+                    }
+                </div>
+            </div>
         </div>
         }
     </div>
 </app-header>
 
 <!-- Lista de clientes -->
-<main class="pb-6 pt-2">
+<main class="pb-24 pt-2">
+    <!-- Skeleton loading -->
+    @if (isLoading()) {
+    <ul class="flex flex-col">
+        @for (i of [1,2,3,4,5,6]; track i) {
+        <li class="flex items-center gap-3 px-4 py-3 border-b border-border/40">
+            <div class="w-10 h-10 rounded-xl bg-muted animate-pulse shrink-0"></div>
+            <div class="flex-1 flex flex-col gap-1.5">
+                <div class="h-3.5 rounded-full bg-muted animate-pulse w-3/4"></div>
+                <div class="h-3 rounded-full bg-muted animate-pulse w-1/2"></div>
+            </div>
+            <div class="h-8 w-16 rounded-xl bg-muted animate-pulse shrink-0"></div>
+        </li>
+        }
+    </ul>
+    } @else {
     <ul class="flex flex-col">
         @for (cliente of clientesFiltrados(); track cliente.clave) {
         <app-item-cliente [cliente]="cliente" (delete)="eliminarCliente($event)" />
         } @empty {
-        <li class="flex flex-col items-center justify-center py-20 text-center px-2">
+        <li class="flex flex-col items-center justify-center py-20 text-center px-6">
             <div class="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center mb-4">
                 <ng-icon name="lucideUserSearch" size="28" class="text-muted-foreground" />
             </div>
@@ -136,5 +154,22 @@
                 Intenta con otro término.</p>
         </li>
         }
+
+        <!-- Load more -->
+        @if (hasMoreClientes()) {
+        <div class="load-more-container flex justify-center py-4">
+            <button hlmBtn variant="outline" size="sm" class="rounded-lg text-xs gap-1.5" (click)="loadMoreClientes()"
+                [disabled]="isLoadingMore()">
+                @if (isLoadingMore()) {
+                <ng-icon name="lucideLoader2" size="14" class="loading-spinner" />
+                Cargando...
+                } @else {
+                <ng-icon name="lucideChevronDown" size="14" />
+                Cargar más
+                }
+            </button>
+        </div>
+        }
     </ul>
+    }
 </main>
