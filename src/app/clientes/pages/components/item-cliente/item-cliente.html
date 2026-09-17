@@ -1,18 +1,12 @@
-<li class="px-3 py-1" [attr.id]="'cliente-' + cliente().clave">
+<li class="px-4 py-2 transition-colors hover:bg-muted/30" [attr.id]="'cliente-' + cliente().clave">
     <a [routerLink]="['/articulos']" [queryParams]="{ cliente: cliente().clave }"
-        class="flex items-center gap-2 rounded-xl border border-border/70 bg-card px-2.5 py-2 transition-all duration-200 hover:border-primary/30 hover:shadow-sm hover:shadow-primary/10 no-underline group cursor-pointer">
-
-        <!-- Avatar con iniciales -->
-        <div class="shrink-0 flex items-center justify-center w-7 h-7 rounded-2xl text-xs font-medium"
-             [ngClass]="cliente().esClienteBase ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'">
-            {{ getInitials(cliente()!.nombre) }}
-        </div>
+        class="flex items-center gap-2.5 no-underline group cursor-pointer">
 
         <!-- Info -->
         <div class="flex-1 min-w-0 flex flex-col">
             <div class="flex items-center gap-1.5 min-w-0">
-                <span class="text-xs font-semibold text-foreground truncate">
-                    {{ cliente()!.nombre }}
+                <span class="text-[13px] font-semibold text-foreground leading-tight line-clamp-2">
+                    {{ cliente().nombre }}
                 </span>
                 @if (cliente().esClienteBase) {
                 <span class="text-[9px] leading-none text-muted-foreground bg-muted px-1 py-0.5 rounded shrink-0">
@@ -20,20 +14,18 @@
                 </span>
                 }
             </div>
-            <div class="flex items-center gap-1 text-[10px] text-muted-foreground min-w-0">
-                <span class="font-mono shrink-0">{{ cliente()!.clave }}</span>
-                @if (cliente()!.ciudad) {
-                <span class="w-0.5 h-0.5 rounded-full bg-muted-foreground/40 shrink-0"></span>
+            <div class="flex items-center gap-1.5 mt-0.5 text-[10px] text-muted-foreground min-w-0">
+                <span class="font-mono bg-muted/60 px-1.5 py-0.5 rounded shrink-0">{{ cliente().clave }}</span>
+                @if (cliente().ciudad) {
                 <span class="flex items-center gap-0.5 truncate">
-                    <ng-icon name="lucideMapPin" size="9"></ng-icon>
-                    {{ cliente()!.ciudad }}
+                    · <ng-icon name="lucideMapPin" size="9"></ng-icon>
+                    {{ cliente().ciudad }}
                 </span>
                 }
-                @if (cliente()!.telefono) {
-                <span class="w-0.5 h-0.5 rounded-full bg-muted-foreground/40 shrink-0"></span>
+                @if (cliente().telefono) {
                 <span class="flex items-center gap-0.5 truncate">
-                    <ng-icon name="lucidePhone" size="9"></ng-icon>
-                    {{ cliente()!.telefono }}
+                    · <ng-icon name="lucidePhone" size="9"></ng-icon>
+                    {{ cliente().telefono }}
                 </span>
                 }
             </div>
@@ -43,12 +35,12 @@
         @if (!cliente().esClienteBase) {
         <div class="shrink-0 flex items-center gap-0.5">
             <button hlmBtn variant="ghost" size="sm"
-                class="h-7 w-7 rounded-md p-0 text-muted-foreground hover:text-foreground"
+                class="h-7 w-7 rounded-lg p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
                 aria-label="Editar cliente" (click)="$event.preventDefault(); $event.stopPropagation(); onEdit()">
                 <ng-icon name="lucidePencil" size="14"></ng-icon>
             </button>
             <button hlmBtn variant="ghost" size="sm"
-                class="h-7 w-7 rounded-md p-0 text-muted-foreground hover:text-red-500"
+                class="h-7 w-7 rounded-lg p-0 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
                 aria-label="Eliminar cliente"
                 (click)="$event.preventDefault(); $event.stopPropagation(); onDelete()">
                 <ng-icon name="lucideTrash" size="14"></ng-icon>
@@ -57,3 +49,29 @@
         }
     </a>
 </li>
+
+<!-- Modal confirmación de eliminación -->
+@if (showDeleteModal()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <hlm-card class="w-full max-w-sm shadow-lg animate-in zoom-in-95 duration-200">
+        <hlm-card-header>
+            <div class="flex items-center gap-2 text-destructive mb-1">
+                <ng-icon name="lucideAlertTriangle" class="text-xl" />
+                <h3 hlmCardTitle class="text-base">¿Eliminar cliente?</h3>
+            </div>
+            <p hlmCardDescription>
+                Estás a punto de eliminar a <strong class="text-foreground">{{ cliente().nombre }}</strong>.
+                Esta acción no se puede deshacer.
+            </p>
+        </hlm-card-header>
+        <div hlmCardContent class="flex gap-3 justify-end mt-2">
+            <button hlmBtn variant="outline" (click)="cancelDelete()">
+                Cancelar
+            </button>
+            <button hlmBtn variant="destructive" (click)="confirmDelete()">
+                Eliminar
+            </button>
+        </div>
+    </hlm-card>
+</div>
+}

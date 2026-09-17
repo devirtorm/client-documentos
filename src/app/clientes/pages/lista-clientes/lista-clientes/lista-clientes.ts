@@ -6,14 +6,16 @@ import { Cliente } from '../../../interfaces/cliente';
 import { ItemCliente } from "../../components/item-cliente/item-cliente";
 import { Clientes } from '../../../services/clientes';
 import { provideIcons, NgIcon } from '@ng-icons/core';
-import { lucideArrowDown10, lucideArrowDownAZ, lucideArrowUpZA, lucideTrash, lucideUserSearch, lucideLoader2, lucideChevronDown } from '@ng-icons/lucide';
+import { lucideArrowDown10, lucideArrowDownAZ, lucideArrowUpZA, lucideTrash, lucideUserSearch, lucideLoader2, lucideChevronDown, lucideHash } from '@ng-icons/lucide';
 import { AppHeaderComponent } from '../../../../shared/components/app-header/app-header.component';
+import { LoadMoreButtonComponent } from '../../../../shared/components/load-more-button/load-more-button.component';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ConfiguracionService } from '../../../../shared/services/configuracion.service';
 
 @Component({
   selector: 'app-lista-clientes',
-  imports: [RouterLink, ...HlmInputImports, ...HlmButtonImports, ItemCliente, NgIcon, AppHeaderComponent],
+  imports: [RouterLink, ...HlmInputImports, ...HlmButtonImports, ItemCliente, NgIcon, AppHeaderComponent, LoadMoreButtonComponent],
   templateUrl: './lista-clientes.html',
   providers: [
     provideIcons({
@@ -23,7 +25,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
       lucideArrowUpZA,
       lucideArrowDown10,
       lucideLoader2,
-      lucideChevronDown
+      lucideChevronDown,
+      lucideHash,
     })
   ]
 })
@@ -46,6 +49,7 @@ export class ListaClientes {
   protected readonly clientes = signal<Cliente[]>([]);
 
   private clientesService = inject(Clientes);
+  private configService = inject(ConfiguracionService);
 
   // Debounce search
   private readonly searchSubject = new Subject<string>();
@@ -84,6 +88,7 @@ export class ListaClientes {
   }
 
   ngOnInit(): void {
+    this.pageSize.set(this.configService.itemsPorPagina());
     this.cargarClientes(true);
   }
 
@@ -112,6 +117,7 @@ export class ListaClientes {
     if (orden === 'nombre') sortParam = `nombre,${dir}`;
     else if (orden === 'codigo') sortParam = `clave,${dir}`;
     else if (orden === 'zona') sortParam = `ciudad,${dir}`;
+    else if (orden === 'ordenVisita') sortParam = `ordenVisita,${dir}`;
 
     this.clientesService.getPagedClientes(page, size, search, dia, sortParam).subscribe({
         next: (pageRes) => {
@@ -120,7 +126,6 @@ export class ListaClientes {
             } else {
                 this.clientes.update(current => [...current, ...pageRes.content]);
             }
-            console.log('Clientes cargados:', pageRes.page.totalPages, 'páginas,', pageRes.page.totalElements, 'elementos.', 'Página actual:', pageRes.page.number);
             this.clientesCurrentPage.set(pageRes.page.number);
             this.clientesTotalPages.set(pageRes.page.totalPages);
             this.clientesTotalElements.set(pageRes.page.totalElements);

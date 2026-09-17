@@ -36,11 +36,19 @@
             <div hlmCardContent class="flex flex-col gap-4">
                 <div class="grid gap-1.5">
                     <label hlmLabel for="clave">Clave *</label>
-                    <input formControlName="clave" type="text" id="clave" placeholder="Ej. C-001250" required
-                        hlmInput
-                        [class.bg-muted/50]="isEditMode()"
-                        [class.text-muted-foreground]="isEditMode()"
-                        [class.cursor-not-allowed]="isEditMode()" />
+                    <div class="relative">
+                        <input formControlName="clave" type="text" id="clave" placeholder="Ej. C-001250" required
+                            hlmInput class="w-full"
+                            [class.bg-muted/50]="isEditMode() || isLoadingClave()"
+                            [class.text-muted-foreground]="isEditMode() || isLoadingClave()"
+                            [class.cursor-not-allowed]="isEditMode() || isLoadingClave()" />
+                        @if (isLoadingClave()) {
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-muted-foreground pointer-events-none">
+                            <ng-icon name="lucideLoader2" size="13" class="animate-spin" />
+                            <span class="text-[11px]">Calculando...</span>
+                        </div>
+                        }
+                    </div>
                     @if (form.controls.clave.touched && form.controls.clave.errors?.['required']) {
                     <p class="text-xs text-destructive">La clave es obligatoria</p>
                     }
@@ -95,6 +103,13 @@
                     <input formControlName="diaRevision" type="text" id="diaRevision" placeholder="Ej. Lunes, Miércoles"
                         hlmInput />
                 </div>
+
+                <div class="grid gap-1.5">
+                    <label hlmLabel for="ordenVisita">Orden de visita</label>
+                    <input formControlName="ordenVisita" type="number" id="ordenVisita" min="1"
+                        placeholder="Ej. 1, 2, 3..." hlmInput />
+                    <p class="text-[11px] text-muted-foreground">Indica el orden en que el agente visita esta tienda en su ruta.</p>
+                </div>
             </div>
         </hlm-card>
 
@@ -102,13 +117,9 @@
         <hlm-card class="mb-4">
             <hlm-card-header class="pb-3">
                 <h3 hlmCardTitle class="text-sm">Datos adicionales</h3>
-                <p hlmCardDescription>Información complementaria (Extra 1 - 4)</p>
+                <p hlmCardDescription>Información complementaria (Extra 2 - 4)</p>
             </hlm-card-header>
             <div hlmCardContent class="grid grid-cols-2 gap-4">
-                <div class="grid gap-1.5">
-                    <label hlmLabel for="extra1">Extra 1</label>
-                    <input formControlName="extra1" type="text" id="extra1" placeholder="Dato extra 1" hlmInput />
-                </div>
                 <div class="grid gap-1.5">
                     <label hlmLabel for="extra2">Extra 2</label>
                     <input formControlName="extra2" type="text" id="extra2" placeholder="Dato extra 2" hlmInput />

@@ -71,7 +71,6 @@ export class Clientes {
             params = params.set('sort', sort);
         }
 
-        console.log('Fetching paged clientes', `${this.apiUrl}/${claveAgente}` + ' with params:', params.toString());
         return this.http.get<Page<Cliente>>(`${this.apiUrl}/${claveAgente}`, { params }).pipe(
             tap(pageRes => {
                 if (pageRes?.content?.length) {
@@ -116,6 +115,11 @@ export class Clientes {
 
         const payload = { ...cliente, agente: claveAgente };
         return this.http.put<Cliente>(`${this.apiUrl}/${claveAgente}`, payload, { params });
+    }
+
+    getLastClave(): Observable<string> {
+        const claveAgente = this.auth.currentAgente();
+        return this.http.get(`${this.apiUrl}/agente/${claveAgente}/last-clave`, { responseType: 'text' });
     }
 
 }

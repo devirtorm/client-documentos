@@ -4,6 +4,7 @@ export interface Cliente {
     telefono?: string;
     ciudad?: string;
     diaRevision?: string;
+    ordenVisita?: string;
     esClienteBase?: string;
     email?: string;
     direccion?: string;

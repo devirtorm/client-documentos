@@ -42,6 +42,7 @@ export class RegistrarCliente implements CanComponentDeactivate {
 
   protected readonly isEditMode = signal(false);
   protected readonly isLoading = signal(false);
+  protected readonly isLoadingClave = signal(false);
   protected readonly isSubmitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly showLeaveModal = signal(false);
@@ -56,8 +57,8 @@ export class RegistrarCliente implements CanComponentDeactivate {
     ciudad: [''],
     direccion: [''],
     diaRevision: [''],
+    ordenVisita: [''],
     esClienteBase: [''],
-    extra1: [''],
     extra2: [''],
     extra3: [''],
     extra4: [''],
@@ -70,6 +71,7 @@ export class RegistrarCliente implements CanComponentDeactivate {
   ngOnInit(): void {
     const clave = this.route.snapshot.paramMap.get('clave');
     if (clave) {
+      // Modo edición
       this.isEditMode.set(true);
       this.isLoading.set(true);
       this.form.controls.clave.disable();
@@ -84,8 +86,8 @@ export class RegistrarCliente implements CanComponentDeactivate {
             ciudad: cliente.ciudad ?? '',
             direccion: cliente.direccion ?? '',
             diaRevision: cliente.diaRevision ?? '',
+            ordenVisita: cliente.ordenVisita ?? '',
             esClienteBase: cliente.esClienteBase ?? '',
-            extra1: cliente.extra1 ?? '',
             extra2: cliente.extra2 ?? '',
             extra3: cliente.extra3 ?? '',
             extra4: cliente.extra4 ?? '',
@@ -102,6 +104,22 @@ export class RegistrarCliente implements CanComponentDeactivate {
           this.isLoading.set(false);
           this.errorMessage.set('No se pudo cargar los datos del cliente.');
           console.error('Error al cargar cliente:', err);
+        },
+      });
+    } else {
+      // Modo nuevo: cargar última clave sugerida
+      this.isLoadingClave.set(true);
+      this.form.controls.clave.disable();
+      this.clientesService.getLastClave().subscribe({
+        next: (lastClave) => {
+          this.form.controls.clave.enable();
+          this.form.patchValue({ clave: lastClave });
+          this.form.markAsPristine();
+          this.isLoadingClave.set(false);
+        },
+        error: () => {
+          this.form.controls.clave.enable();
+          this.isLoadingClave.set(false);
         },
       });
     }
