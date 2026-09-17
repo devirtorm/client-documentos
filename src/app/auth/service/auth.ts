@@ -50,12 +50,17 @@ export class Auth {
                 this.setAlmacen(response.almacen ?? null);
             }),
             catchError(() => {
-                this.currentUser.set(null);
-                this.currentAgente.set(null);
-                this.setAlmacen(null);
+                this.clearSession();
                 return of(null);
             })
         );
+    }
+
+    /** Limpia el estado local sin hacer petición al servidor */
+    clearSession(): void {
+        this.currentUser.set(null);
+        this.currentAgente.set(null);
+        this.setAlmacen(null);
     }
 
     private setAlmacen(almacen: string | null): void {

@@ -1,0 +1,120 @@
+<!-- Header fijo -->
+<app-header title="Configuración">
+    <div subtitle-content class="text-[11px] text-muted-foreground mt-0.5">
+        Personaliza tu experiencia
+    </div>
+</app-header>
+
+<!-- Contenido -->
+<main class="pb-24 pt-3 px-3 flex flex-col gap-3">
+
+    <!-- ── Sección: Documentos ── -->
+    <div class="flex flex-col">
+        <p class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-1.5">
+            Documentos
+        </p>
+        <div class="rounded-2xl border border-border/70 bg-card overflow-hidden divide-y divide-border/40 shadow-xs">
+
+            <!-- Tipo de documento -->
+            <div class="px-4 py-3">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                        <ng-icon name="lucideFileText" size="18" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-foreground">Tipo de documento</p>
+                        <p class="text-[11px] text-muted-foreground mt-0.5">Define qué tipo de documento se genera al hacer un pedido</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    @for (tipo of tiposDocumento; track tipo.value) {
+                    <button
+                        hlmBtn
+                        [variant]="cfg.tipoDocumento() === tipo.value ? 'default' : 'outline'"
+                        size="sm"
+                        class="flex-1 h-16 flex flex-col items-center justify-center gap-1 rounded-xl text-xs font-medium transition-all"
+                        (click)="setTipoDocumento(tipo.value)">
+                        <ng-icon [name]="tipo.icon" size="18" />
+                        <span class="font-semibold">{{ tipo.label }}</span>
+                        @if (cfg.tipoDocumento() === tipo.value) {
+                        <span class="text-[10px] opacity-80">Activo</span>
+                        }
+                    </button>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── Sección: Apariencia ── -->
+    <div class="flex flex-col">
+        <p class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-1.5">
+            Apariencia
+        </p>
+        <div class="rounded-2xl border border-border/70 bg-card overflow-hidden divide-y divide-border/40 shadow-xs">
+
+            <!-- Tema -->
+            <div class="px-4 py-3">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                        <ng-icon name="lucideSun" size="18" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-foreground">Tema de la app</p>
+                        <p class="text-[11px] text-muted-foreground mt-0.5">Elige entre modo claro, oscuro o el del sistema</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    @for (tema of temas; track tema.value) {
+                    <button
+                        hlmBtn
+                        [variant]="themeService.theme() === tema.value ? 'default' : 'outline'"
+                        size="sm"
+                        class="flex-1 h-14 flex flex-col items-center justify-center gap-1 rounded-xl text-xs font-medium transition-all"
+                        (click)="setTema(tema.value)">
+                        <ng-icon [name]="tema.icon" size="16" />
+                        <span>{{ tema.label }}</span>
+                    </button>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── Sección: Lista de artículos ── -->
+    <div class="flex flex-col">
+        <p class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-1.5">
+            Lista de artículos
+        </p>
+        <div class="rounded-2xl border border-border/70 bg-card overflow-hidden divide-y divide-border/40 shadow-xs">
+
+            <!-- Elementos por página -->
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="shrink-0 flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+                    <ng-icon name="lucideList" size="18" />
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-foreground">Artículos por página</p>
+                    <p class="text-[11px] text-muted-foreground mt-0.5">Cantidad que se carga inicialmente</p>
+                </div>
+                <div class="flex gap-1.5 shrink-0">
+                    @for (n of [10, 20, 50]; track n) {
+                    <button
+                        hlmBtn
+                        [variant]="cfg.config().itemsPorPagina === n ? 'default' : 'outline'"
+                        size="sm"
+                        class="w-11 h-8 rounded-lg text-xs font-semibold px-0"
+                        (click)="setItemsPorPagina(n)">
+                        {{ n }}
+                    </button>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</main>

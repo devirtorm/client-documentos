@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { credentialsInterceptor } from './auth/interceptors/credentials-interceptor';
+import { authExpiredInterceptor } from './auth/interceptors/auth-expired-interceptor';
 import { Auth } from './auth/service/auth';
 
 import { ThemeService } from './shared/services/theme.service';
@@ -21,7 +22,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([credentialsInterceptor])),
+    provideHttpClient(withInterceptors([credentialsInterceptor, authExpiredInterceptor])),
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,

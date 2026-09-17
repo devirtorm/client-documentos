@@ -8,40 +8,40 @@
             [class]="cantidad() > 0
                 ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
                 : 'bg-gradient-to-br from-muted to-muted/60 text-muted-foreground'">
-            {{ getInitials(articulo()!.descripcion) }}
+            {{ getInitials(articulo().descripcion) }}
         </div>
 
         <!-- Info central -->
         <div class="flex-1 min-w-0">
             <!-- Título -->
             <p class="text-[13px] font-semibold text-foreground leading-tight truncate">
-                {{ articulo()!.descripcion }}
+                {{ articulo().descripcion }}
             </p>
 
             <!-- Tags: clave, unidad, existencia -->
             <div class="flex items-center gap-1.5 mt-0.5">
                 <span class="text-[10px] font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">
-                    {{ articulo()!.clave }}
+                    {{ articulo().clave }}
                 </span>
-                @if (articulo()!.unidadPrimaria) {
+                @if (articulo().unidadPrimaria) {
                 <span class="text-[10px] text-muted-foreground">
-                    · {{ articulo()!.unidadPrimaria }}
+                    · {{ articulo().unidadPrimaria }}
                 </span>
                 }
                 <span class="text-[10px]"
-                    [class]="(articulo()!.existenciaTotal ?? 0) > 0 ? 'text-emerald-600 font-medium' : 'text-destructive font-medium'">
-                    · {{ (articulo()!.existenciaTotal ?? 0) > 0 ? (articulo()!.existenciaTotal + ' disp.') : 'Agotado' }}
+                    [class]="(articulo().existenciaTotal ?? 0) > 0 ? 'text-emerald-600 font-medium' : 'text-destructive font-medium'">
+                    · {{ (articulo().existenciaTotal ?? 0) > 0 ? (articulo().existenciaTotal + ' disp.') : 'Agotado' }}
                 </span>
             </div>
 
             <!-- Precio y Descuento -->
             <div class="flex items-center gap-1.5 mt-1">
-                @if (precioBase() > precioEfectivo()) {
+                @if (porcentajeDescuento() > 0) {
                 <span class="text-[10px] text-muted-foreground line-through tabular-nums">
                     {{ precioBase() | currency:'$' }}
                 </span>
                 <span class="inline-flex items-center text-[9px] font-bold text-emerald-700 bg-emerald-500/15 px-1 py-0.2 rounded leading-none">
-                    -{{ ((precioBase() - precioEfectivo()) / precioBase() * 100) | number:'1.0-0' }}%
+                    -{{ porcentajeDescuento() }}%
                 </span>
                 }
                 <span class="text-[13px] font-bold text-foreground tabular-nums">
@@ -54,6 +54,7 @@
         <div class="shrink-0 flex flex-col items-end justify-center min-w-[76px]">
             @if (cantidad() === 0) {
             <button hlmBtn variant="outline" size="sm"
+                aria-label="Agregar al carrito"
                 class="h-7 px-2.5 rounded-xl border-border/80 text-xs font-semibold gap-1 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-150"
                 (click)="incrementar(); $event.stopPropagation()">
                 <ng-icon name="lucideShoppingCart" size="12"></ng-icon>
@@ -63,30 +64,34 @@
             <div class="flex flex-col items-end gap-1">
                 <div class="flex items-center rounded-xl border border-primary/40 bg-background shadow-xs p-0.5">
                     <button hlmBtn variant="ghost" size="sm"
+                        aria-label="Disminuir cantidad"
                         class="h-6 w-6 rounded-lg p-0 text-foreground hover:bg-muted"
                         (click)="decrementar(); $event.stopPropagation()">
                         <ng-icon name="lucideMinus" size="11"></ng-icon>
                     </button>
 
                     <input type="number" min="0"
+                        aria-label="Cantidad"
                         class="w-7 h-6 text-center text-xs font-bold bg-transparent focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-primary"
                         [value]="cantidad()"
                         (input)="onCantidadInput($event)"
                         (click)="$event.stopPropagation()" />
 
                     <button hlmBtn variant="ghost" size="sm"
+                        aria-label="Aumentar cantidad"
                         class="h-6 w-6 rounded-lg p-0 text-foreground hover:bg-muted"
                         (click)="incrementar(); $event.stopPropagation()">
                         <ng-icon name="lucidePlus" size="11"></ng-icon>
                     </button>
                 </div>
                 <div class="flex items-center justify-between w-full min-w-[76px] px-0.5">
-                    <button class="text-[10px] text-destructive/80 hover:text-destructive font-semibold" 
+                    <button class="text-[10px] text-destructive/80 hover:text-destructive font-semibold"
+                        aria-label="Quitar del carrito"
                         (click)="eliminar(); $event.stopPropagation()">
                         Quitar
                     </button>
                     <span class="text-[10px] text-muted-foreground tabular-nums">
-                        {{ precioEfectivo() * cantidad() | currency:'$' }}
+                        {{ subtotal() | currency:'$' }}
                     </span>
                 </div>
             </div>
@@ -94,3 +99,4 @@
         </div>
     </div>
 </li>
+

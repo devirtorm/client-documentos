@@ -69,20 +69,9 @@
         }
     </div>
 
-    <!-- Load more -->
+    <!-- Cargar más -->
     @if (hasMoreRemisiones()) {
-    <div class="load-more-container">
-        <button hlmBtn variant="outline" size="sm" class="rounded-lg text-xs gap-1.5" (click)="loadMoreRemisiones()"
-            [disabled]="isLoadingMore()">
-            @if (isLoadingMore()) {
-            <ng-icon name="lucideLoader2" size="14" class="loading-spinner" />
-            Cargando...
-            } @else {
-            <ng-icon name="lucideChevronDown" size="14" />
-            Cargar más
-            }
-        </button>
-    </div>
+    <app-load-more-button [loading]="isLoadingMore()" (loadMore)="loadMoreRemisiones()" />
     }
     }
 
@@ -118,20 +107,9 @@
         }
     </div>
 
-    <!-- Load more -->
+    <!-- Cargar más -->
     @if (hasMorePedidos()) {
-    <div class="load-more-container">
-        <button hlmBtn variant="outline" size="sm" class="rounded-lg text-xs gap-1.5" (click)="loadMorePedidos()"
-            [disabled]="isLoadingMore()">
-            @if (isLoadingMore()) {
-            <ng-icon name="lucideLoader2" size="14" class="loading-spinner" />
-            Cargando...
-            } @else {
-            <ng-icon name="lucideChevronDown" size="14" />
-            Cargar más
-            }
-        </button>
-    </div>
+    <app-load-more-button [loading]="isLoadingMore()" (loadMore)="loadMorePedidos()" />
     }
     }
 

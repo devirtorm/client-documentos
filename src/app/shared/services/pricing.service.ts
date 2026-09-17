@@ -16,12 +16,10 @@ export class PricingService {
         if (fechaFinal) {
             const end = new Date(fechaFinal);
             end.setHours(23, 59, 59, 999);
-            if (now > end.getTime()) return false; // Ya expiró
+            if (now > end.getTime()) return false;
         }
 
-        console.log('Descuento vigente:', fechaInicial, fechaFinal);
-
-        return true; // Es válido si cumple las condiciones (o si no hay límites)
+        return true; 
     }
 
     getDescuentosCliente(cliente?: Cliente) {

@@ -129,20 +129,9 @@
         }
     </ul>
     }
-        <!-- Load more -->
+        <!-- Cargar más -->
         @if (hasMoreArticulos()) {
-        <div class="load-more-container py-3">
-            <button hlmBtn variant="outline" size="sm" class="rounded-lg text-xs gap-1.5" (click)="loadMoreArticulos()"
-                [disabled]="isLoadingMore()">
-                @if (isLoadingMore()) {
-                <ng-icon name="lucideLoader2" size="14" class="loading-spinner" />
-                Cargando...
-                } @else {
-                <ng-icon name="lucideChevronDown" size="14" />
-                Cargar más
-                }
-            </button>
-        </div>
+        <app-load-more-button [loading]="isLoadingMore()" (loadMore)="loadMoreArticulos()" />
         }
 </main>
 
@@ -150,7 +139,7 @@
 @if (totalItemsCarrito() > 0) {
 <div class="fixed bottom-20 left-0 right-0 z-40 px-4 animate-in slide-in-from-bottom-4 duration-300">
     <button hlmBtn variant="default"
-        class="w-full h-14 rounded-2xl shadow-2xl shadow-primary/25 flex items-center justify-between px-5 gap-3"
+        class="w-full h-14 rounded-3xl shadow-2xl backdrop-blur-2xl bg-primary/60 shadow-primary/25 flex items-center justify-between px-5 gap-3"
         id="btn-abrir-carrito" (click)="verCarrito()">
 
         <!-- Icono carrito + badge -->
@@ -167,7 +156,7 @@
                     {{ totalItemsCarrito() }}
                 </span>
             </div>
-            <span class="text-sm font-semibold">Ver pedido</span>
+            <span class="text-sm font-semibold">Ver carrito</span>
         </div>
 
         <!-- Total -->

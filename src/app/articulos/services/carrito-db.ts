@@ -22,7 +22,6 @@ export class CarritoDB {
     async guardarItem(item: CarritoItem): Promise<void> {
         const id = `${item.agenteId}_${item.clienteClave}_${item.articuloClave}`;
         const itemToSave = { ...item, id };
-        console.log('Guardando item con ID:', id, itemToSave);
         await db.carritoItems.put(itemToSave);
     }
 

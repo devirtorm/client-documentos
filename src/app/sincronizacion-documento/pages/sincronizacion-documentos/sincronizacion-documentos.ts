@@ -8,6 +8,7 @@ import { Clientes } from '../../../clientes/services/clientes';
 import { PricingService } from '../../../shared/services/pricing.service';
 import { Conexion } from '../../../shared/services/conexion';
 import { GenerarDocumentoRequest } from '../../../documentos/interfaces/documento';
+import { ConfiguracionService } from '../../../shared/services/configuracion.service';
 import { SincronizacionHeaderComponent } from '../../components/sincronizacion-header/sincronizacion-header.component';
 import { SincronizacionSkeletonComponent } from '../../components/sincronizacion-skeleton/sincronizacion-skeleton.component';
 import { SincronizacionEmptyStateComponent } from '../../components/sincronizacion-empty-state/sincronizacion-empty-state.component';
@@ -33,6 +34,7 @@ export class SincronizacionDocumentos {
   private clientesService = inject(Clientes);
   private pricingService = inject(PricingService);
   private conexionService = inject(Conexion);
+  private configuracionService = inject(ConfiguracionService);
 
   protected readonly isLoading = signal<boolean>(true);
   protected readonly isSyncingAll = signal<boolean>(false);
@@ -115,7 +117,7 @@ export class SincronizacionDocumentos {
 
       // 2. Construir GenerarDocumentoRequest para Delphi
       const request: GenerarDocumentoRequest = {
-        tipoDocumento: 'P',
+        tipoDocumento: this.configuracionService.tipoDocumento(),
         cliProv: doc.clienteId,
         agente: agenteId,
         almacen: almacen,

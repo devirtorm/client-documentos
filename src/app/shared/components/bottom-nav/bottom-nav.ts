@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { lucideHome, lucideUsers, lucideContactRound, lucideListOrdered, lucideFileArchive, lucideFile, lucideCloudSync, lucideUser, lucideSettings, lucideLogOut, lucideWifi, lucideWifiOff } from '@ng-icons/lucide';
+import { lucideHome, lucideUsers, lucideContactRound, lucideListOrdered, lucideFileArchive, lucideFile, lucideCloudSync, lucideUser, lucideSettings, lucideLogOut, lucideWifi, lucideWifiOff, lucideChevronRight } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmSwitchImports } from '@spartan-ng/helm/switch';
 import { Conexion } from '../../services/conexion';
@@ -31,7 +31,8 @@ import { HlmSheetImports } from '@spartan-ng/helm/sheet';
       lucideSettings,
       lucideLogOut,
       lucideWifi,
-      lucideWifiOff
+      lucideWifiOff,
+      lucideChevronRight
     })
   ],
   host: {
@@ -54,7 +55,6 @@ export class BottomNav {
 
   ngOnInit() {
     this.networkSub = this.conexionService.isOnline$.subscribe(status => {
-      console.log('estado actual', status);
       this.isOnline = status;
     });
   }

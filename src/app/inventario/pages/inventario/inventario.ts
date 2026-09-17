@@ -1,5 +1,6 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
+import { LoadMoreButtonComponent } from '../../../shared/components/load-more-button/load-more-button.component';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -10,7 +11,7 @@ import { Inventario as IInventario } from '../../interfaces/inventario';
 
 @Component({
   selector: 'app-inventario',
-  imports: [AppHeaderComponent, NgIcon, ...HlmInputImports, ...HlmButtonImports],
+  imports: [AppHeaderComponent, NgIcon, ...HlmInputImports, ...HlmButtonImports, LoadMoreButtonComponent],
   templateUrl: './inventario.html',
   providers: [
     provideIcons({

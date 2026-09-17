@@ -18,6 +18,7 @@ import { DocumentoHistorial } from '../../interfaces/documento';
 import { ItemDocumento } from "../components/item-documento/item-documento";
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
+import { LoadMoreButtonComponent } from '../../../shared/components/load-more-button/load-more-button.component';
 
 type TabType = 'remisiones' | 'pedidos';
 
@@ -29,7 +30,8 @@ type TabType = 'remisiones' | 'pedidos';
         ...HlmBadgeImports,
         NgIcon,
         ItemDocumento,
-        AppHeaderComponent
+        AppHeaderComponent,
+        LoadMoreButtonComponent
     ],
     templateUrl: './historial.html',
     styleUrl: './historial.css',

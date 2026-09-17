@@ -17,7 +17,7 @@
     <ng-container right-action>
         @if (!isEmpty()) {
         <button hlmBtn variant="ghost" size="sm"
-            class="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl text-xs h-8 px-2.5 mr-2"
+            class="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-3xl text-xs h-8 px-2.5 mr-2"
             (click)="limpiarTodo()" id="btn-limpiar-carrito">
             <ng-icon name="lucideTrash2" size="14" class="mr-1" />
             Vaciar
@@ -172,7 +172,7 @@
         </div>
 
         <!-- Botón confirmar -->
-        <button hlmBtn variant="default" class="w-full h-12 text-sm font-semibold" id="btn-confirmar-pedido"
+        <button hlmBtn variant="default" class="rounded-3xl w-full h-12 text-sm font-semibold" id="btn-confirmar-pedido"
             (click)="guardarDocumento()">
             <ng-icon name="lucideShoppingCart" size="18" class="mr-2" />
             Confirmar pedido

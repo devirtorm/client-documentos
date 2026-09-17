@@ -15,11 +15,13 @@ import { provideIcons, NgIcon } from '@ng-icons/core';
 import { lucidePackageSearch, lucideLoader2, lucideChevronDown } from '@ng-icons/lucide';
 import { CurrencyPipe } from '@angular/common';
 import { AppHeaderComponent } from '../../../../shared/components/app-header/app-header.component';
+import { LoadMoreButtonComponent } from '../../../../shared/components/load-more-button/load-more-button.component';
 import { debounceTime, distinctUntilChanged, Subject, Subscription } from 'rxjs';
+import { ConfiguracionService } from '../../../../shared/services/configuracion.service';
 
 @Component({
   selector: 'app-lista-articulos',
-  imports: [...HlmInputImports, ...HlmButtonImports, ItemArticulo, NgIcon, CurrencyPipe, AppHeaderComponent],
+  imports: [...HlmInputImports, ...HlmButtonImports, ItemArticulo, NgIcon, CurrencyPipe, AppHeaderComponent, LoadMoreButtonComponent],
   templateUrl: './lista-articulos.html',
   styleUrl:'./lista-articulos.css',
   providers: [
@@ -40,6 +42,7 @@ export class ListaArticulos {
   protected readonly articulosCurrentPage = signal(0);
   protected readonly articulosTotalElements = signal(0);
   protected readonly articulosTotalPages = signal(0);
+  protected readonly itemsPorPagina = signal(10);
 
   // Debounce search
   private readonly searchSubject = new Subject<string>();
@@ -56,6 +59,7 @@ export class ListaArticulos {
   private clientesDB = inject(ClientesDB);
   private clientesService = inject(Clientes);
   private pricingService = inject(PricingService);
+  private configService = inject(ConfiguracionService);
   protected clienteSeleccionado = signal<Cliente | undefined>(undefined);
 
   constructor() {
@@ -86,6 +90,7 @@ export class ListaArticulos {
 
   async ngOnInit(): Promise<void> {
     const clienteId = this.route.snapshot.queryParamMap.get('cliente');
+    this.itemsPorPagina.set(this.configService.itemsPorPagina());
     if (clienteId) {
       const local = await this.clientesDB.getCliente(clienteId);
       if (local) {
@@ -109,7 +114,7 @@ export class ListaArticulos {
   protected cargarArticulos(): void {
     this.isLoading.set(true);
     const query = this.searchQuery();
-    this.articulosService.getAllArticulos(0, 10, query).subscribe({
+    this.articulosService.getAllArticulos(0, this.itemsPorPagina(), query).subscribe({
       next: async (page) => {
         this.articulos.set(page.content);
         this.articulosCurrentPage.set(page.page.number);
@@ -186,7 +191,6 @@ export class ListaArticulos {
   private async persistirCambio(event: ArticuloCantidad): Promise<void> {
     const agenteId = this.auth.currentAgente();
     const clienteId = this.route.snapshot.queryParamMap.get('cliente');
-    console.log('persistirCambio → agenteId:', agenteId, 'clienteId:', clienteId);
     if (!agenteId || !clienteId) return;
 
     if (event.cantidad === 0) {
