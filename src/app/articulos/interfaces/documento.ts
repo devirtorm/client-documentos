@@ -11,4 +11,5 @@ export interface Documento {
     total: number;
     fecha: string;
     estatus: DocumentoEstatus;
+    tipoDocumento: 'P' | 'M';
 }

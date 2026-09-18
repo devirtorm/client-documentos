@@ -10,6 +10,7 @@ import {
     lucideLoader2,
     lucidePackageSearch,
     lucideChevronDown,
+    lucideWifiOff,
 } from '@ng-icons/lucide';
 import { Remisiones } from '../../services/remisiones';
 import { RemisionHistorial } from '../../interfaces/remision';
@@ -19,6 +20,7 @@ import { ItemDocumento } from "../components/item-documento/item-documento";
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
 import { LoadMoreButtonComponent } from '../../../shared/components/load-more-button/load-more-button.component';
+import { Conexion } from '../../../shared/services/conexion';
 
 type TabType = 'remisiones' | 'pedidos';
 
@@ -43,12 +45,14 @@ type TabType = 'remisiones' | 'pedidos';
             lucideLoader2,
             lucidePackageSearch,
             lucideChevronDown,
+            lucideWifiOff,
         }),
     ],
 })
 export class Historial implements OnDestroy {
     private remisionesService = inject(Remisiones);
     private pedidosService = inject(Pedidos);
+    protected conexionService = inject(Conexion);
 
     protected readonly activeTab = signal<TabType>('remisiones');
     protected readonly searchQuery = signal('');

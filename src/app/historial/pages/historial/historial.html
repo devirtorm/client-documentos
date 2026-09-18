@@ -1,5 +1,6 @@
 <!-- Header fijo -->
 <app-header title="Historial">
+    @if (conexionService.isOnline) {
     <div bottom-content>
         <!-- Tabs: Remisiones / Pedidos -->
         <div class=" px-4 pb-0">
@@ -35,10 +36,20 @@
             </div>
         </div>
     </div>
+    }
 </app-header>
 
 <!-- Contenido -->
 <main class="pb-6">
+    @if (!conexionService.isOnline) {
+    <div class="empty-state" style="margin-top: 4rem;">
+        <ng-icon name="lucideWifiOff" size="48" class="text-muted-foreground/50 mb-2" />
+        <p class="text-base font-medium text-foreground mb-1">Sin conexión</p>
+        <p class="text-sm text-muted-foreground text-center max-w-[250px]">
+            El historial de documentos requiere conexión a internet.
+        </p>
+    </div>
+    } @else {
     <!-- Tab Remisiones -->
     @if (activeTab() === 'remisiones') {
 
@@ -113,5 +124,6 @@
     }
     }
 
+    }
     }
 </main>

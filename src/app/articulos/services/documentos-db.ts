@@ -56,4 +56,11 @@ export class DocumentosDB {
     async contarPendientes(): Promise<number> {
         return db.documentos.where('estatus').equals('pendiente' satisfies DocumentoEstatus).count();
     }
+
+    async obtenerRemisionesPendientes(): Promise<Documento[]> {
+        return db.documentos
+            .where('estatus').equals('pendiente' satisfies DocumentoEstatus)
+            .filter(doc => doc.tipoDocumento === 'M')
+            .toArray();
+    }
 }

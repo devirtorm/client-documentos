@@ -24,6 +24,7 @@ import { ClientesDB } from '../../../clientes/services/clientes-db';
 import { GenerarDocumentoRequest } from '../../../documentos/interfaces/documento';
 import { PricingService } from '../../../shared/services/pricing.service';
 import { firstValueFrom } from 'rxjs';
+import { ConfiguracionService } from '../../../shared/services/configuracion.service';
 
 @Component({
     selector: 'app-carrito',
@@ -52,6 +53,7 @@ export class Carrito {
     private clientesService = inject(Clientes);
     private clientesDB = inject(ClientesDB);
     private pricingService = inject(PricingService);
+    private configService = inject(ConfiguracionService);
 
     protected readonly items = signal<CarritoItem[]>([]);
     protected readonly isLoading = signal(true);
@@ -198,7 +200,7 @@ export class Carrito {
     protected async guardarOnline(agenteId: string, clienteId: string): Promise<void> {
         const almacen = this.auth.currentAlmacen() ?? '';
         const request: GenerarDocumentoRequest = {
-            tipoDocumento: 'P', 
+            tipoDocumento: this.configService.tipoDocumento(), 
             cliProv: clienteId,
             agente: agenteId,
             almacen: almacen,
@@ -246,6 +248,7 @@ export class Carrito {
             total: this.totalPrecio(),
             fecha: now.toISOString(),
             estatus: 'pendiente',
+            tipoDocumento: this.configService.tipoDocumento(),
         };
 
         console.log(documento);
