@@ -1,9 +1,26 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Cliente } from '../../clientes/interfaces/cliente';
 import { Articulo } from '../../articulos/interfaces/articulo';
+import { PrecioCliente } from '../../articulos/interfaces/precio-cliente';
+import { ArticulosDB } from '../../articulos/services/articulos-db';
 
 @Injectable({ providedIn: 'root' })
 export class PricingService {
+    private readonly articulosDB = inject(ArticulosDB);
+
+    // Diccionario reactivo: { 'claveCliente-claveArticulo': PrecioCliente }
+    preciosEspeciales = signal<Map<string, PrecioCliente>>(new Map());
+
+    constructor() {
+        this.cargarPreciosEnMemoria();
+    }
+
+    async cargarPreciosEnMemoria() {
+        const precios = await this.articulosDB.getTodosPreciosCliente();
+        const mapa = new Map<string, PrecioCliente>();
+        precios.forEach(p => mapa.set(`${p.cliente}-${p.articulo}`, p));
+        this.preciosEspeciales.set(mapa);
+    }
 
     isDescuentoVigente(fechaInicial?: string, fechaFinal?: string): boolean {
         const now = new Date().getTime();
@@ -70,6 +87,21 @@ export class PricingService {
     }
 
     getPrecioEfectivoArticulo(articulo: Articulo, cliente?: Cliente): number {
+        if (cliente) {
+            const especial = this.preciosEspeciales().get(`${cliente.clave}-${articulo.clave}`);
+            if (especial && this.isDescuentoVigente(especial.fechaInicialDescuentos, especial.fechaFinalDescuentos)) {
+                let precioBase = especial.precioUP ? Number(especial.precioUP) : this.getPrecioBaseArticulo(articulo, cliente);
+                const descsEspeciales = {
+                    d1: especial.descuento1 ? Number(especial.descuento1) : 0,
+                    d2: especial.descuento2 ? Number(especial.descuento2) : 0,
+                    d3: especial.descuento3 ? Number(especial.descuento3) : 0
+                };
+                const precioConDescsEspecial = this.calcularPrecioConDescuento(precioBase, descsEspeciales);
+                const descsCliente = this.getDescuentosCliente(cliente);
+                return this.calcularPrecioConDescuento(precioConDescsEspecial, descsCliente);
+            }
+        }
+
         const precioBase = this.getPrecioBaseArticulo(articulo, cliente);
         const descsArticulo = this.getDescuentosArticulo(articulo);
         const precioConDescsArticulo = this.calcularPrecioConDescuento(precioBase, descsArticulo);

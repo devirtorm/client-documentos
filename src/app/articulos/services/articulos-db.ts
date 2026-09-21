@@ -1,16 +1,26 @@
 import { Service } from '@angular/core';
 import Dexie, { Table } from 'dexie';
 import { Articulo } from '../interfaces/articulo';
+import { PrecioCliente } from '../interfaces/precio-cliente';
 
 class ArticulosDatabase extends Dexie {
     articulos!: Table<Articulo>;
+    preciosCliente!: Table<PrecioCliente>;
 
     constructor() {
         super('articulos-offline-db');
         this.version(1).stores({
             articulos: 'clave, descripcion',
         });
+        
+        // V2: Add preciosCliente with composite-like primary key [cliente+articulo]
+        this.version(2).stores({
+            articulos: 'clave, descripcion',
+            preciosCliente: '[cliente+articulo]'
+        });
+
         this.articulos = this.table('articulos');
+        this.preciosCliente = this.table('preciosCliente');
     }
 }
 
@@ -21,6 +31,15 @@ export class ArticulosDB {
 
     async guardarArticulos(articulos: Articulo[]): Promise<void> {
         await db.articulos.bulkPut(articulos);
+    }
+
+    async guardarPreciosCliente(precios: PrecioCliente[]): Promise<void> {
+        await db.preciosCliente.clear(); // Limpiamos tabla anterior
+        await db.preciosCliente.bulkPut(precios);
+    }
+
+    async getTodosPreciosCliente(): Promise<PrecioCliente[]> {
+        return db.preciosCliente.toArray();
     }
 
     async getPagedArticulos(page: number, size: number, search?: string) {

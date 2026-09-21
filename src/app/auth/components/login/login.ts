@@ -12,13 +12,16 @@ import { Router, RouterLink } from '@angular/router';
   imports: [HlmCardImports, HlmButtonImports, HlmInputImports, HlmLabelImports, ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   host: {
-    class: 'w-full flex items-center justify-center',
+    class: 'w-full flex flex-col items-center justify-center px-4 py-8',
   },
 })
 export class Login {
   private fb = inject(NonNullableFormBuilder);
   private router = inject(Router);
   private auth = inject(Auth);
+
+  public readonly errorMessage = signal<string | null>(null);
+  public readonly currentYear = signal<number>(new Date().getFullYear());
 
   form = this.fb.group({
     username: ['', Validators.required],
@@ -27,12 +30,30 @@ export class Login {
 
 
   onsubmit() {
+    this.errorMessage.set(null);
     if (this.form.valid) {
-      this.auth.login(this.form.getRawValue()).subscribe({
+      const credentials = this.form.getRawValue();
+      const payload = {
+        ...credentials,
+        licenseToken: localStorage.getItem('licenseToken') || ''
+      };
+
+      this.auth.login(payload).subscribe({
         next: () => {
           this.router.navigate(['/clientes']);
         },
-        error: (err: any) => console.error('Error de autenticación', err)
+        error: (err: any) => {
+          console.error('Error de autenticación', err);
+          if (err.status === 401) {
+            this.errorMessage.set('La contraseña es incorrecta.');
+          } else if (err.status === 404) {
+            this.errorMessage.set('El usuario no existe.');
+          } else if (err.status === 403) {
+            this.errorMessage.set('Dispositivo no autorizado o licencia vencida. Por favor, registre este equipo.');
+          } else {
+            this.errorMessage.set('Ocurrió un error inesperado al iniciar sesión.');
+          }
+        }
       });
     }
   }

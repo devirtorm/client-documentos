@@ -8,6 +8,7 @@ import { Page } from '../../shared/interfaces/pagination';
 import { Conexion } from '../../shared/services/conexion';
 import { ArticulosDB } from './articulos-db';
 import { DocumentosDB } from './documentos-db';
+import { PricingService } from '../../shared/services/pricing.service';
 
 @Service()
 export class Articulos {
@@ -17,6 +18,7 @@ export class Articulos {
     private readonly conexion = inject(Conexion);
     private readonly articulosDB = inject(ArticulosDB);
     private readonly documentosDB = inject(DocumentosDB);
+    private readonly pricingService = inject(PricingService);
 
     constructor() {
         this.conexion.isOnline$.subscribe(isOnline => {
@@ -32,8 +34,22 @@ export class Articulos {
 
     sincronizarArticulosBackendToLocal(): Observable<void> {
         return this.getArticulosOffline().pipe(
-            switchMap(articulos => from(this.articulosDB.guardarArticulos(articulos)))
+            switchMap(articulos => from(this.articulosDB.guardarArticulos(articulos))),
+            // Usamos any para el cast rápido o revisamos si el objeto currentUser tiene clave
+            switchMap(() => {
+                const currentUser: string | null = this.auth.currentAgente();
+                return this.getPreciosEspecialesOffline(currentUser ?? '');
+            }),
+            switchMap(precios => from(this.articulosDB.guardarPreciosCliente(precios))),
+            tap(() => {
+                this.pricingService.cargarPreciosEnMemoria();
+            })
         );
+    }
+
+    private getPreciosEspecialesOffline(agente: string): Observable<import('../interfaces/precio-cliente').PrecioCliente[]> {
+        if (!agente) return from([[]]);
+        return this.http.get<import('../interfaces/precio-cliente').PrecioCliente[]>(`${this.apiUrl}/precios-especiales/offline/agente/${agente}`);
     }
 
     private getArticulosOffline(): Observable<Articulo[]> {

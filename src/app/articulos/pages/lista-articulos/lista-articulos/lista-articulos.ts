@@ -12,7 +12,17 @@ import { Articulos } from '../../../services/articulos';
 import { CarritoDB } from '../../../services/carrito-db';
 import { Auth } from '../../../../auth/service/auth';
 import { provideIcons, NgIcon } from '@ng-icons/core';
-import { lucidePackageSearch, lucideLoader2, lucideChevronDown } from '@ng-icons/lucide';
+import { 
+  lucidePackageSearch, 
+  lucideLoader2, 
+  lucideChevronDown,
+  lucideSearch,
+  lucideSlidersHorizontal,
+  lucideArrowDownAZ,
+  lucideArrowDown01,
+  lucideDollarSign,
+  lucideShoppingCart
+} from '@ng-icons/lucide';
 import { CurrencyPipe } from '@angular/common';
 import { AppHeaderComponent } from '../../../../shared/components/app-header/app-header.component';
 import { LoadMoreButtonComponent } from '../../../../shared/components/load-more-button/load-more-button.component';
@@ -29,6 +39,12 @@ import { ConfiguracionService } from '../../../../shared/services/configuracion.
       lucidePackageSearch,
       lucideLoader2,
       lucideChevronDown,
+      lucideSearch,
+      lucideSlidersHorizontal,
+      lucideArrowDownAZ,
+      lucideArrowDown01,
+      lucideDollarSign,
+      lucideShoppingCart
     })
   ]
 })
@@ -196,11 +212,23 @@ export class ListaArticulos {
     if (event.cantidad === 0) {
       await this.carritoDB.eliminarItem(agenteId, clienteId, event.articulo.clave);
     } else {
-      const descsArticulo = this.pricingService.getDescuentosArticulo(event.articulo);
+      let precioBase = this.pricingService.getPrecioBaseArticulo(event.articulo, this.clienteSeleccionado());
+      let descsArticulo = this.pricingService.getDescuentosArticulo(event.articulo);
+
+      const especial = this.pricingService.preciosEspeciales().get(`${clienteId}-${event.articulo.clave}`);
+      if (especial && this.pricingService.isDescuentoVigente(especial.fechaInicialDescuentos, especial.fechaFinalDescuentos)) {
+          precioBase = especial.precioUP ? Number(especial.precioUP) : precioBase;
+          descsArticulo = {
+              d1: especial.descuento1 ? Number(especial.descuento1) : 0,
+              d2: especial.descuento2 ? Number(especial.descuento2) : 0,
+              d3: especial.descuento3 ? Number(especial.descuento3) : 0
+          };
+      }
+
       await this.carritoDB.guardarItem({
         articuloClave: event.articulo.clave,
         articuloDescripcion: event.articulo.descripcion,
-        articuloPrecio: this.pricingService.getPrecioBaseArticulo(event.articulo, this.clienteSeleccionado()),
+        articuloPrecio: precioBase,
         cantidad: event.cantidad,
         agenteId,
         clienteClave: clienteId,

@@ -1,6 +1,11 @@
 <!-- Header fijo -->
 <app-header title="Artículos">
     <div subtitle-content class="text-[11px] text-muted-foreground mt-0.5">
+        @if (clienteSeleccionado()) {
+            <div class="font-medium text-foreground truncate max-w-[280px] mb-0.5">
+                {{ clienteSeleccionado()?.nombre }}
+            </div>
+        }
         {{ articulos().length }} resultado{{ articulos().length !== 1 ? 's' : '' }}
         @if (totalItemsCarrito() > 0) {
         <span class="text-primary font-semibold ml-1">
@@ -14,12 +19,7 @@
         <div class="px-4 pb-2.5 flex items-center gap-2">
             <!-- Búsqueda -->
             <div class="relative flex-1">
-                <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
-                    xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.3-4.3" />
-                </svg>
+                <ng-icon name="lucideSearch" size="14" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"></ng-icon>
                 <input hlmInput type="text" placeholder="Buscar por nombre o clave..."
                     class="w-full pl-8 pr-3 h-9 text-sm rounded-xl" [value]="searchQuery()" (input)="onSearch($event)"
                     id="search-articulos" />
@@ -29,18 +29,7 @@
             <button hlmBtn variant="outline" size="icon" class="shrink-0 h-9 w-9 rounded-xl" (click)="toggleFiltros()"
                 [class.bg-primary]="mostrarFiltros()" [class.text-primary-foreground]="mostrarFiltros()"
                 aria-label="Filtros">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="21" x2="14" y1="4" y2="4" />
-                    <line x1="10" x2="3" y1="4" y2="4" />
-                    <line x1="21" x2="12" y1="12" y2="12" />
-                    <line x1="8" x2="3" y1="12" y2="12" />
-                    <line x1="21" x2="16" y1="20" y2="20" />
-                    <line x1="12" x2="3" y1="20" y2="20" />
-                    <line x1="14" x2="14" y1="2" y2="6" />
-                    <line x1="8" x2="8" y1="10" y2="14" />
-                    <line x1="16" x2="16" y1="18" y2="22" />
-                </svg>
+                <ng-icon name="lucideSlidersHorizontal" size="16"></ng-icon>
             </button>
         </div>
 
@@ -53,38 +42,17 @@
                 <div class="flex gap-1.5 mt-1.5">
                     <button hlmBtn [variant]="ordenSeleccionado() === 'descripcion' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('descripcion')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="mr-1">
-                            <path d="m3 16 4 4 4-4" />
-                            <path d="M7 20V4" />
-                            <path d="M11 4h4" />
-                            <path d="M11 8h7" />
-                            <path d="M11 12h10" />
-                        </svg>
+                        <ng-icon name="lucideArrowDownAZ" size="12" class="mr-1"></ng-icon>
                         Descripción
                     </button>
                     <button hlmBtn [variant]="ordenSeleccionado() === 'codigo' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('codigo')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="mr-1">
-                            <path d="m3 8 4-4 4 4" />
-                            <path d="M7 4v16" />
-                            <rect x="15" y="4" width="4" height="6" ry="2" />
-                            <path d="M17 20v-6h-2" />
-                            <path d="M15 20h4" />
-                        </svg>
+                        <ng-icon name="lucideArrowDown01" size="12" class="mr-1"></ng-icon>
                         Código
                     </button>
                     <button hlmBtn [variant]="ordenSeleccionado() === 'precio' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('precio')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="mr-1">
-                            <line x1="12" x2="12" y1="2" y2="22" />
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                        </svg>
+                        <ng-icon name="lucideDollarSign" size="12" class="mr-1"></ng-icon>
                         Precio
                     </button>
                 </div>
@@ -145,12 +113,7 @@
         <!-- Icono carrito + badge -->
         <div class="flex items-center gap-3">
             <div class="relative">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="8" cy="21" r="1" />
-                    <circle cx="19" cy="21" r="1" />
-                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-                </svg>
+                <ng-icon name="lucideShoppingCart" size="22"></ng-icon>
                 <span
                     class="absolute -top-2 -right-2.5 bg-primary-foreground text-primary text-[10px] font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
                     {{ totalItemsCarrito() }}

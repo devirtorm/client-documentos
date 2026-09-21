@@ -1,5 +1,5 @@
 <!-- Header -->
-<app-header title="Mi Pedido" [showBackBtn]="true" (back)="volver()">
+<app-header title="Carrito" [showBackBtn]="true" (back)="volver()">
     <div subtitle-content class="flex flex-col text-[11px] text-muted-foreground mt-0.5">
         @if (clienteNombre()) {
             <span class="font-medium text-foreground max-w-[200px] truncate">{{ clienteNombre() }}</span>
@@ -157,7 +157,7 @@
                 <span class="tabular-nums">-{{ totalDescuento() | currency:'$' }}</span>
             </div>
             }
-            <div class="flex items-center justify-between pt-1 border-t border-border/40">
+            <div class="flex items-center justify-between pt-1 border-border/40">
                 <div class="text-xs text-muted-foreground">
                     <span class="font-medium text-foreground">{{ totalItems() }}</span>
                     artículo{{ totalItems() !== 1 ? 's' : '' }}

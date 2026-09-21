@@ -5,7 +5,12 @@
     </hlm-card-header>
 
     <div hlmCardContent>
-        <form [formGroup]="form">
+        @if (errorMessage()) {
+            <div class="bg-destructive/15 text-destructive text-sm p-3 rounded-md mb-4 flex items-center justify-center text-center">
+                {{ errorMessage() }}
+            </div>
+        }
+        <form [formGroup]="form" (ngSubmit)="registrarDispositivo()" id="register-form">
             <div class="flex flex-col gap-4">
                 <div class="grid gap-2">
                     <label hlmLabel for="nombre">Nombre del Dispositivo</label>
@@ -22,7 +27,7 @@
     </div>
 
     <hlm-card-footer class="flex-col gap-3 pt-2">
-        <button hlmBtn type="submit" class="w-full">Registrar</button>
+        <button hlmBtn type="submit" class="w-full" form="register-form">Registrar</button>
 
         <div class="relative w-full my-1">
             <div class="absolute inset-0 flex items-center">

@@ -1,6 +1,7 @@
 export interface LoginDTO {
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
+  licenseToken?: string;
 }
 
 export interface AuthResponse {
