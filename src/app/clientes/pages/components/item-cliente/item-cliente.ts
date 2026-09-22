@@ -9,7 +9,7 @@ import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-item-cliente',
-  imports: [NgIcon, RouterLink, NgClass, ...HlmButtonImports, ...HlmCardImports],
+  imports: [NgIcon, RouterLink, ...HlmButtonImports, ...HlmCardImports],
   templateUrl: './item-cliente.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [

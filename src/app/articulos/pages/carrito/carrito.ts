@@ -59,6 +59,7 @@ export class Carrito {
     protected readonly isLoading = signal(true);
     protected readonly clienteDescuentos = signal({ d1: 0, d2: 0, d3: 0 });
     protected readonly clienteNombre = signal<string>('');
+    protected readonly isSubmitted = signal(false);
 
     protected readonly totalItems = computed(() =>
         this.items().reduce((sum, item) => sum + item.cantidad, 0),
@@ -186,7 +187,7 @@ export class Carrito {
     }
 
     protected guardarDocumento(): void {
-        console.log('Guardando documento...');
+        this.isSubmitted.set(true);
         const agenteId = this.auth.currentAgente();
         const clienteId = this.route.snapshot.queryParamMap.get('cliente');
 
@@ -218,7 +219,7 @@ export class Carrito {
                 descuento3: item.descuento3 || 0
             }))
         };
-
+        console.log('Generando documento online con request:', request);
         this.documentosService.generarDocumento(request).subscribe({
             next: async (response) => {
                 if (response.success) {
@@ -229,9 +230,11 @@ export class Carrito {
                 } else {
                     console.error('La API retornó error:', response.mensaje);
                 }
+                this.isSubmitted.set(false);
             },
             error: (err) => {
                 console.error('Error al generar el pedido online:', err);
+                this.isSubmitted.set(false);
             }
         });
     }
@@ -255,6 +258,7 @@ export class Carrito {
 
         await this.documentosDB.guardarDocumento(documento);
         await this.carritoDB.limpiarCarrito(agenteId, clienteId);
+        this.isSubmitted.set(false);
         this.items.set([]);
         this.volver();
     }

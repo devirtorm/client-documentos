@@ -14,7 +14,7 @@ export interface ArticuloCantidad {
 
 @Component({
   selector: 'app-item-articulo',
-  imports: [CurrencyPipe, DecimalPipe, NgIcon, ...HlmButtonImports, ...HlmInputImports],
+  imports: [CurrencyPipe, NgIcon, ...HlmButtonImports, ...HlmInputImports],
   viewProviders: [provideIcons({ lucideMinus, lucidePlus, lucideShoppingCart })],
   templateUrl: './item-articulo.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

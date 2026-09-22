@@ -7,8 +7,9 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowLeft, lucideUserPlus, lucideSave, lucideLoader2, lucideAlertTriangle } from '@ng-icons/lucide';
+import { lucideArrowLeft, lucideUserPlus, lucideSave, lucideLoader2, lucideAlertTriangle, lucideWifiOff } from '@ng-icons/lucide';
 import { Clientes } from '../../services/clientes';
+import { Conexion } from '../../../shared/services/conexion';
 import { CanComponentDeactivate } from '../../../shared/guards/unsaved-changes.guard';
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
 
@@ -30,6 +31,7 @@ import { AppHeaderComponent } from '../../../shared/components/app-header/app-he
       lucideSave,
       lucideLoader2,
       lucideAlertTriangle,
+      lucideWifiOff,
     }),
   ],
   templateUrl: './registrar-cliente.html',
@@ -39,6 +41,7 @@ export class RegistrarCliente implements CanComponentDeactivate {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private clientesService = inject(Clientes);
+  protected readonly conexion = inject(Conexion);
 
   protected readonly isEditMode = signal(false);
   protected readonly isLoading = signal(false);
@@ -47,6 +50,7 @@ export class RegistrarCliente implements CanComponentDeactivate {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly showLeaveModal = signal(false);
   protected readonly clienteNombre = signal('');
+  protected readonly savedOffline = signal(false);  // ← nuevo: cliente guardado sin internet
   private leaveResponse?: Subject<boolean>;
 
   form = this.fb.group({
@@ -133,6 +137,7 @@ export class RegistrarCliente implements CanComponentDeactivate {
 
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
+    this.savedOffline.set(false);
 
     const formData = this.form.getRawValue();
 
@@ -143,7 +148,28 @@ export class RegistrarCliente implements CanComponentDeactivate {
     request$.subscribe({
       next: () => {
         this.form.markAsPristine();
-        this.router.navigate(['/clientes']);
+        if (!this.isEditMode() && !this.conexion.isOnline) {
+          // Modo offline: resetear formulario y recargar siguiente clave sugerida
+          this.isSubmitting.set(false);
+          this.savedOffline.set(true);
+          this.form.reset();
+          this.form.controls.clave.disable();
+          this.isLoadingClave.set(true);
+          this.clientesService.getLastClave().subscribe({
+            next: (lastClave) => {
+              this.form.controls.clave.enable();
+              this.form.patchValue({ clave: lastClave });
+              this.form.markAsPristine();
+              this.isLoadingClave.set(false);
+            },
+            error: () => {
+              this.form.controls.clave.enable();
+              this.isLoadingClave.set(false);
+            },
+          });
+        } else {
+          this.router.navigate(['/clientes']);
+        }
       },
       error: (err: any) => {
         this.isSubmitting.set(false);

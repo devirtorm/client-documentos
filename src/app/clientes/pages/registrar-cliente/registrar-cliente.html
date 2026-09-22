@@ -25,6 +25,19 @@
     </div>
     }
 
+    <!-- Banner: guardado offline -->
+    @if (savedOffline()) {
+    <div class="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-800 flex items-start gap-2.5">
+        <ng-icon name="lucideWifiOff" class="text-amber-600 dark:text-amber-400 text-sm shrink-0 mt-0.5" />
+        <div>
+            <p class="text-sm font-medium text-amber-800 dark:text-amber-300">Guardado sin conexión</p>
+            <p class="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                El cliente se guardó localmente. Se sincronizará automáticamente cuando haya internet.
+            </p>
+        </div>
+    </div>
+    }
+
     <form [formGroup]="form" (ngSubmit)="onSubmit()" id="registrar-form">
 
         <!-- Datos principales -->
@@ -100,8 +113,16 @@
 
                 <div class="grid gap-1.5">
                     <label hlmLabel for="diaRevision">Día de revisión</label>
-                    <input formControlName="diaRevision" type="text" id="diaRevision" placeholder="Ej. Lunes, Miércoles"
-                        hlmInput />
+                    <select formControlName="diaRevision" id="diaRevision" class="w-full text-sm" hlmInput>
+                        <option value="" disabled selected>Seleccione un día...</option>
+                        <option value="LUNES">Lunes</option>
+                        <option value="MARTES">Martes</option>
+                        <option value="MIERCOLES">Miércoles</option>
+                        <option value="JUEVES">Jueves</option>
+                        <option value="VIERNES">Viernes</option>
+                        <option value="SABADO">Sábado</option>
+                        <option value="DOMINGO">Domingo</option>
+                    </select>
                 </div>
 
                 <div class="grid gap-1.5">

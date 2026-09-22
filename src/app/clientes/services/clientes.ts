@@ -1,5 +1,5 @@
 import { inject, Service } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable, from, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { Cliente } from '../interfaces/cliente';
 import { environment } from '../../../environments/environment';
@@ -8,6 +8,7 @@ import { Auth } from '../../auth/service/auth';
 import { Conexion } from '../../shared/services/conexion';
 import { ClientesDB } from './clientes-db';
 import { Page } from '../../shared/interfaces/pagination';
+import { firstValueFrom } from 'rxjs';
 
 @Service()
 export class Clientes {
@@ -21,17 +22,21 @@ export class Clientes {
         // Escuchar cambios en la conectividad (isOnlineSubject)
         this.conexion.isOnline$.subscribe(isOnline => {
             if (isOnline) {
-                // Cuando estamos online, recargamos la base de datos local
-                console.log('Sincronizando clientes hacia la BD local...');
-                this.sincronizarClientesBackendToLocal().subscribe({
-                    next: () => console.log('Clientes sincronizados exitosamente en Dexie'),
-                    error: (err) => console.error('Error sincronizando clientes', err)
+                // Cuando estamos online, sincronizamos pendientes y luego recargamos la BD local
+                console.log('Conexión recuperada: sincronizando clientes pendientes...');
+                this.sincronizarClientesPendientes().then(() => {
+                    console.log('Clientes pendientes procesados. Sincronizando clientes hacia la BD local...');
+                    this.sincronizarClientesBackendToLocal().subscribe({
+                        next: () => console.log('Clientes sincronizados exitosamente en Dexie'),
+                        error: (err) => console.error('Error sincronizando clientes', err)
+                    });
                 });
             }
         });
     }
 
-    // Método para el Sync Manager (Descarga masiva cuando hay internet)
+    // ── Sync Backend → Local ──────────────────────────────────────────────────
+
     sincronizarClientesBackendToLocal(): Observable<void> {
         return this.getClientesOffline().pipe(
             switchMap(clientes => from(this.clientesDB.guardarClientes(clientes)))
@@ -45,6 +50,29 @@ export class Clientes {
             .set('idUsuario', claveUsuario ?? '');
         return this.http.get<Cliente[]>(`${this.apiUrl}/${claveAgente}/offline`, { params });
     }
+
+    // ── Sync Local → Backend (clientes creados offline) ───────────────────────
+
+    async sincronizarClientesPendientes(): Promise<void> {
+        const pendientes = await this.clientesDB.getClientesPendientes();
+        if (pendientes.length === 0) return;
+
+        console.log(`Sincronizando ${pendientes.length} clientes pendientes...`);
+
+        for (const pendiente of pendientes) {
+            const { _pendienteId, _intentos, ...clienteData } = pendiente;
+            try {
+                await firstValueFrom(this.crearClienteEnServidor(clienteData));
+                await this.clientesDB.eliminarClientePendiente(_pendienteId);
+                console.log(`Cliente ${clienteData.clave} sincronizado exitosamente.`);
+            } catch (err) {
+                await this.clientesDB.incrementarIntentosPendiente(_pendienteId);
+                console.error(`Error sincronizando cliente ${clienteData.clave} (intento ${_intentos + 1}):`, err);
+            }
+        }
+    }
+
+    // ── CRUD ──────────────────────────────────────────────────────────────────
 
     getPagedClientes(page: number, size: number, search?: string, diaRevision?: string, sort?: string): Observable<Page<Cliente>> {
         // Interceptar: Si NO hay conexión, leemos de la base de datos local Dexie
@@ -80,10 +108,31 @@ export class Clientes {
         );
     }
 
+    /**
+     * Crea un cliente. Si no hay conexión, lo guarda localmente como pendiente
+     * y lo sincroniza automáticamente cuando se recupere internet.
+     */
     crearCliente(cliente: Omit<Cliente, 'id'>): Observable<Cliente> {
         const claveAgente = this.auth.currentAgente();
-        const payload = { ...cliente, agente: claveAgente };
-        return this.http.post<Cliente>(`${this.apiUrl}`, payload);
+        const clienteConAgente = { ...cliente, agente: claveAgente } as Cliente;
+
+        if (!this.conexion.isOnline) {
+            // Guardamos offline y emitimos el objeto local como respuesta
+            return from(
+                this.clientesDB.guardarClientePendiente(clienteConAgente).then(() => clienteConAgente)
+            );
+        }
+
+        return this.crearClienteEnServidor(clienteConAgente);
+    }
+
+    private crearClienteEnServidor(cliente: Cliente): Observable<Cliente> {
+        return this.http.post<Cliente>(`${this.apiUrl}`, cliente).pipe(
+            tap(clienteCreado => {
+                // Guardar en local para disponibilidad offline inmediata
+                this.clientesDB.guardarClientes([clienteCreado]);
+            })
+        );
     }
 
     eliminarCliente(clave: string): Observable<void> {
@@ -107,6 +156,7 @@ export class Clientes {
             })
         );
     }
+
     actualizarCliente(clave: string, cliente: Partial<Cliente>): Observable<Cliente> {
         const claveAgente = this.auth.currentAgente();
         
@@ -118,6 +168,11 @@ export class Clientes {
     }
 
     getLastClave(): Observable<string> {
+        if (!this.conexion.isOnline) {
+            return from(
+                this.clientesDB.getLastClave().then(clave => clave ?? '00001')
+            );
+        }
         const claveAgente = this.auth.currentAgente();
         return this.http.get(`${this.apiUrl}/agente/${claveAgente}/last-clave`, { responseType: 'text' });
     }

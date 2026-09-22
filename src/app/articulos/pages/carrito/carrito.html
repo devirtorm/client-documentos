@@ -172,7 +172,11 @@
         </div>
 
         <!-- Botón confirmar -->
-        <button hlmBtn variant="default" class="rounded-3xl w-full h-12 text-sm font-semibold" id="btn-confirmar-pedido"
+        <button 
+            hlmBtn 
+            variant="default" 
+            class="rounded-3xl w-full h-12 text-sm font-semibold" id="btn-confirmar-pedido"
+            [disabled]="isSubmitted()"
             (click)="guardarDocumento()">
             <ng-icon name="lucideShoppingCart" size="18" class="mr-2" />
             Confirmar pedido
