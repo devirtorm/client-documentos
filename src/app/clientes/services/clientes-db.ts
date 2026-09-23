@@ -124,6 +124,10 @@ export class ClientesDB {
         }
     }
 
+    async eliminarCliente(clave: string): Promise<void> {
+        await db.clientes.delete(clave);
+    }
+
     async hayClientesPendientes(): Promise<boolean> {
         const count = await db.clientesPendientes.count();
         return count > 0;

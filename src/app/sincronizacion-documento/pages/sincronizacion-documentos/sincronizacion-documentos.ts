@@ -9,6 +9,7 @@ import { PricingService } from '../../../shared/services/pricing.service';
 import { Conexion } from '../../../shared/services/conexion';
 import { GenerarDocumentoRequest } from '../../../documentos/interfaces/documento';
 import { ConfiguracionService } from '../../../shared/services/configuracion.service';
+import { BluetoothPrinterService } from '../../../shared/services/bluetooth-printer.service';
 import { SincronizacionHeaderComponent } from '../../components/sincronizacion-header/sincronizacion-header.component';
 import { SincronizacionSkeletonComponent } from '../../components/sincronizacion-skeleton/sincronizacion-skeleton.component';
 import { SincronizacionEmptyStateComponent } from '../../components/sincronizacion-empty-state/sincronizacion-empty-state.component';
@@ -35,6 +36,7 @@ export class SincronizacionDocumentos {
   private pricingService = inject(PricingService);
   private conexionService = inject(Conexion);
   private configuracionService = inject(ConfiguracionService);
+  readonly btPrinter = inject(BluetoothPrinterService);
 
   protected readonly isLoading = signal<boolean>(true);
   protected readonly isSyncingAll = signal<boolean>(false);
@@ -153,6 +155,32 @@ export class SincronizacionDocumentos {
         await this.documentoDB.marcarError(doc.id);
       }
       return false;
+    }
+  }
+
+  async onImprimirItem(doc: Documento): Promise<void> {
+    // Si hay un device conocido pero está desconectado, reconectar sin diálogo
+    if (!this.btPrinter.isConnected && this.btPrinter.device) {
+      try {
+        await this.btPrinter.reconnect();
+      } catch {
+        alert('No se pudo reconectar con la impresora. Verifica que esté encendida.');
+        return;
+      }
+    }
+
+    // Si aún no hay conexión (nunca se seleccionó impresora)
+    if (!this.btPrinter.isConnected) {
+      alert('Conecta primero la impresora usando el botón Bluetooth del encabezado.');
+      return;
+    }
+
+    try {
+      const empresa = this.authService.currentAgente() ?? 'Mi Empresa';
+      await this.btPrinter.imprimirDocumento(doc, empresa);
+    } catch (err) {
+      console.error('[Impresión BT] Error:', err);
+      alert('Error al imprimir. Verifica la conexión con la impresora.');
     }
   }
 }

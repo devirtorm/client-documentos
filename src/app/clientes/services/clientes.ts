@@ -137,7 +137,16 @@ export class Clientes {
 
     eliminarCliente(clave: string): Observable<void> {
         const claveAgente = this.auth.currentAgente();
-        return this.http.delete<void>(`${this.apiUrl}/${claveAgente}/${clave}`);
+
+        if (!this.conexion.isOnline) {
+            // Sin conexión: eliminar solo localmente
+            return from(this.clientesDB.eliminarCliente(clave));
+        }
+
+        // Con conexión: eliminar en el backend y luego en local
+        return this.http.delete<void>(`${this.apiUrl}/${claveAgente}/${clave}`).pipe(
+            switchMap(() => from(this.clientesDB.eliminarCliente(clave)))
+        );
     }
 
     getCliente(clave: string): Observable<Cliente> {

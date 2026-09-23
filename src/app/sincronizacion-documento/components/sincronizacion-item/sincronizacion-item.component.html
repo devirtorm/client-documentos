@@ -46,6 +46,14 @@
 
         <!-- Acciones directas a la derecha -->
         <div class="shrink-0 flex items-center gap-1.5" (click)="$event.stopPropagation()">
+            <!-- Botón imprimir ticket -->
+            <button hlmBtn variant="ghost" size="sm"
+                class="h-7 w-7 p-0 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                title="Imprimir ticket"
+                (click)="onImprimir()">
+                <ng-icon name="lucidePrinter" size="14"></ng-icon>
+            </button>
+
             <button hlmBtn variant="default" size="sm" [disabled]="isSyncing()"
                 class="h-7 px-2.5 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 gap-1 shadow-2xs"
                 (click)="onSincronizar()">

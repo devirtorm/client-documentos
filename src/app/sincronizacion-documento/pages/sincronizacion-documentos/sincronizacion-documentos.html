@@ -2,7 +2,11 @@
 <app-sincronizacion-header 
     [count]="items().length" 
     [isSyncing]="isSyncingAll()"
-    (sincronizarTodo)="onSincronizarTodo()">
+    [btStatus]="btPrinter.status()"
+    [btDeviceName]="btPrinter.deviceName()"
+    (sincronizarTodo)="onSincronizarTodo()"
+    (conectarBT)="btPrinter.connect()"
+    (desconectarBT)="btPrinter.disconnect()">
 </app-sincronizacion-header>
 
 <!-- Contenido -->
@@ -19,7 +23,8 @@
             [item]="item" 
             [isSyncing]="syncingDocId() === item.id || isSyncingAll()"
             (descartar)="onDescartarItem($event.id!)"
-            (sincronizar)="onSincronizarIndividual($event)">
+            (sincronizar)="onSincronizarIndividual($event)"
+            (imprimir)="onImprimirItem($event)">
         </app-sincronizacion-item>
         }
     </div>

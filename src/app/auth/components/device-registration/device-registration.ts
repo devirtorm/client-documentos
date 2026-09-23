@@ -31,18 +31,21 @@ export class DeviceRegistration {
 
   registrarDispositivo() {
     this.errorMessage.set(null);
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     let deviceId = localStorage.getItem('deviceId');
     if (!deviceId) {
-      deviceId = crypto.randomUUID();
+      deviceId = this.generateUUID();
       localStorage.setItem('deviceId', deviceId);
     }
 
     const formValue = this.form.getRawValue();
     const payload = {
       nombre: formValue.nombre,
-      clave: formValue.password,
+      clave: formValue.password.toUpperCase(),
       idDispositivo: deviceId
     };
 
@@ -64,6 +67,18 @@ export class DeviceRegistration {
           }
         }
       });
+  }
+
+  private generateUUID(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    // Fallback para browsers que no soportan crypto.randomUUID
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
 }
