@@ -42,8 +42,9 @@ export class ArticulosDB {
         return db.preciosCliente.toArray();
     }
 
-    async getPagedArticulos(page: number, size: number, search?: string) {
+    async getPagedArticulos(page: number, size: number, search?: string, sort: string = 'descripcion') {
         let allArticulos = await db.articulos.toArray();
+
         if (search && search.trim() !== '') {
             const s = search.trim().toLowerCase();
             allArticulos = allArticulos.filter(a =>
@@ -51,6 +52,24 @@ export class ArticulosDB {
                 (a.clave && a.clave.toLowerCase().includes(s))
             );
         }
+
+        // Ordenamiento local equivalente al del servidor
+        const partes = sort.split(',');
+        const campo = partes[0];
+        const dir = partes[1] ?? 'asc';
+
+        allArticulos.sort((a, b) => {
+            let cmp: number;
+            if (campo === 'precio1') {
+                cmp = (a.precio1 ?? 0) - (b.precio1 ?? 0);
+            } else if (campo === 'clave') {
+                cmp = (a.clave ?? '').localeCompare(b.clave ?? '');
+            } else {
+                cmp = (a.descripcion ?? '').localeCompare(b.descripcion ?? '', undefined, { sensitivity: 'base' });
+            }
+            return dir === 'desc' ? -cmp : cmp;
+        });
+
         const totalElements = allArticulos.length;
         const totalPages = Math.ceil(totalElements / size);
         const content = allArticulos.slice(page * size, (page + 1) * size);

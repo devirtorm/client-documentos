@@ -12,6 +12,7 @@ import { LoadMoreButtonComponent } from '../../../../shared/components/load-more
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ConfiguracionService } from '../../../../shared/services/configuracion.service';
+import { toast } from '@spartan-ng/brain/sonner';
 
 @Component({
   selector: 'app-lista-clientes',
@@ -136,6 +137,7 @@ export class ListaClientes {
         error: () => {
             this.isLoading.set(false);
             this.isLoadingMore.set(false);
+            toast.error('Error al cargar la lista de clientes');
         }
     });
   }
@@ -151,8 +153,14 @@ export class ListaClientes {
   }
 
   eliminarCliente(clave: string): void {
-    this.clientesService.eliminarCliente(clave).subscribe(() => {
-      this.cargarClientes(true);
+    this.clientesService.eliminarCliente(clave).subscribe({
+      next: () => {
+        toast.success('Cliente eliminado correctamente');
+        this.cargarClientes(true);
+      },
+      error: () => {
+        toast.error('Error al eliminar cliente');
+      }
     });
   }
 

@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HlmToasterImports, HlmToaster } from '@spartan-ng/helm/sonner';
+import { HlmToaster } from '@spartan-ng/helm/sonner';
 
 
 @Component({

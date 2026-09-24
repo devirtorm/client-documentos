@@ -15,6 +15,7 @@ import { SincronizacionSkeletonComponent } from '../../components/sincronizacion
 import { SincronizacionEmptyStateComponent } from '../../components/sincronizacion-empty-state/sincronizacion-empty-state.component';
 import { SincronizacionItemComponent } from '../../components/sincronizacion-item/sincronizacion-item.component';
 import { firstValueFrom } from 'rxjs';
+import { toast } from '@spartan-ng/brain/sonner';
 
 @Component({
   selector: 'app-sincronizacion-documentos',
@@ -71,7 +72,12 @@ export class SincronizacionDocumentos {
     this.syncingDocId.set(doc.id);
 
     try {
-      await this.sincronizarDocumento(doc);
+      const ok = await this.sincronizarDocumento(doc);
+      if (ok) {
+        toast.success(`Documento sincronizado con éxito`);
+      } else {
+        toast.error(`Error al sincronizar el documento ${doc.folio}`);
+      }
     } finally {
       this.syncingDocId.set(null);
       await this.cargarDocumentos();
@@ -84,11 +90,20 @@ export class SincronizacionDocumentos {
 
     try {
       const docs = [...this.items()];
+      let exitosos = 0;
+      let fallidos = 0;
       for (const doc of docs) {
         if (doc.id) {
           this.syncingDocId.set(doc.id);
-          await this.sincronizarDocumento(doc);
+          const ok = await this.sincronizarDocumento(doc);
+          if (ok) exitosos++;
+          else fallidos++;
         }
+      }
+      if (fallidos === 0) {
+        toast.success(`Todos los documentos (${exitosos}) se sincronizaron con éxito`);
+      } else {
+        toast.error(`Sincronización terminada: ${exitosos} sincronizados, ${fallidos} con error`);
       }
     } finally {
       this.syncingDocId.set(null);
@@ -141,7 +156,6 @@ export class SincronizacionDocumentos {
       // 3. Enviar a la API
       const response = await firstValueFrom(this.documentosService.generarDocumento(request));
       if (response && response.success) {
-        console.log('Documento sincronizado con éxito:', doc.folio, response);
         await this.documentoDB.eliminarDocumento(doc.id!);
         return true;
       } else {
@@ -164,23 +178,24 @@ export class SincronizacionDocumentos {
       try {
         await this.btPrinter.reconnect();
       } catch {
-        alert('No se pudo reconectar con la impresora. Verifica que esté encendida.');
+        toast.error('No se pudo reconectar con la impresora. Verifica que esté encendida.');
         return;
       }
     }
 
     // Si aún no hay conexión (nunca se seleccionó impresora)
     if (!this.btPrinter.isConnected) {
-      alert('Conecta primero la impresora usando el botón Bluetooth del encabezado.');
+      toast.warning('Conecta primero la impresora usando el botón Bluetooth del encabezado.');
       return;
     }
 
     try {
       const empresa = this.authService.currentAgente() ?? 'Mi Empresa';
       await this.btPrinter.imprimirDocumento(doc, empresa);
+      toast.success('Ticket impreso correctamente');
     } catch (err) {
       console.error('[Impresión BT] Error:', err);
-      alert('Error al imprimir. Verifica la conexión con la impresora.');
+      toast.error('Error al imprimir. Verifica la conexión con la impresora.');
     }
   }
 }

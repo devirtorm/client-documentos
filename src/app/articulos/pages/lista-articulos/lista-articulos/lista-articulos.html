@@ -1,5 +1,5 @@
 <!-- Header fijo -->
-<app-header title="Artículos">
+<app-header title="Artículos" [showBackBtn]="true" (back)="volverAClientes()">
     <div subtitle-content class="text-[11px] text-muted-foreground mt-0.5">
         @if (clienteSeleccionado()) {
             <div class="font-medium text-foreground truncate max-w-[280px] mb-0.5">
@@ -42,17 +42,29 @@
                 <div class="flex gap-1.5 mt-1.5">
                     <button hlmBtn [variant]="ordenSeleccionado() === 'descripcion' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('descripcion')">
-                        <ng-icon name="lucideArrowDownAZ" size="12" class="mr-1"></ng-icon>
+                        @if (ordenSeleccionado() === 'descripcion' && ordenDireccion() === 'desc') {
+                        <ng-icon name="lucideArrowUpZA" size="12" class="mr-1" />
+                        } @else {
+                        <ng-icon name="lucideArrowDownAZ" size="12" class="mr-1" />
+                        }
                         Descripción
                     </button>
                     <button hlmBtn [variant]="ordenSeleccionado() === 'codigo' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('codigo')">
-                        <ng-icon name="lucideArrowDown01" size="12" class="mr-1"></ng-icon>
+                        @if (ordenSeleccionado() === 'codigo' && ordenDireccion() === 'desc') {
+                        <ng-icon name="lucideArrowUp01" size="12" class="mr-1" />
+                        } @else {
+                        <ng-icon name="lucideArrowDown01" size="12" class="mr-1" />
+                        }
                         Código
                     </button>
                     <button hlmBtn [variant]="ordenSeleccionado() === 'precio' ? 'default' : 'outline'" size="sm"
                         class="rounded-full text-xs h-7 px-3" (click)="setOrden('precio')">
-                        <ng-icon name="lucideDollarSign" size="12" class="mr-1"></ng-icon>
+                        @if (ordenSeleccionado() === 'precio' && ordenDireccion() === 'desc') {
+                        <ng-icon name="lucideArrowUp01" size="12" class="mr-1" />
+                        } @else {
+                        <ng-icon name="lucideDollarSign" size="12" class="mr-1" />
+                        }
                         Precio
                     </button>
                 </div>
@@ -103,29 +115,3 @@
         }
 </main>
 
-<!-- Botón flotante de carrito -->
-@if (totalItemsCarrito() > 0) {
-<div class="fixed bottom-20 left-0 right-0 z-40 px-4 animate-in slide-in-from-bottom-4 duration-300">
-    <button hlmBtn variant="default"
-        class="w-full h-14 rounded-3xl shadow-2xl backdrop-blur-2xl bg-primary/60 shadow-primary/25 flex items-center justify-between px-5 gap-3"
-        id="btn-abrir-carrito" (click)="verCarrito()">
-
-        <!-- Icono carrito + badge -->
-        <div class="flex items-center gap-3">
-            <div class="relative">
-                <ng-icon name="lucideShoppingCart" size="22"></ng-icon>
-                <span
-                    class="absolute -top-2 -right-2.5 bg-primary-foreground text-primary text-[10px] font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
-                    {{ totalItemsCarrito() }}
-                </span>
-            </div>
-            <span class="text-sm font-semibold">Ver carrito</span>
-        </div>
-
-        <!-- Total -->
-        <span class="text-sm font-bold tabular-nums">
-            {{ totalPrecioCarrito() | currency:'$' }}
-        </span>
-    </button>
-</div>
-}

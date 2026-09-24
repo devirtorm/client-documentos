@@ -8,6 +8,7 @@ import { lucideSearch, lucidePackageSearch, lucideLoader2, lucideChevronDown, lu
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
 import { Inventarios } from '../../services/inventarios';
 import { Inventario as IInventario } from '../../interfaces/inventario';
+import { toast } from '@spartan-ng/brain/sonner';
 
 @Component({
   selector: 'app-inventario',
@@ -74,6 +75,7 @@ export class Inventario implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoading.set(false);
+        toast.error('Error al cargar el inventario');
       }
     });
   }
@@ -98,6 +100,7 @@ export class Inventario implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingMore.set(false);
+        toast.error('Error al cargar más elementos del inventario');
       }
     });
   }

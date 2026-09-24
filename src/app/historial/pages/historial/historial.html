@@ -4,18 +4,18 @@
     <div bottom-content>
         <!-- Tabs: Remisiones / Pedidos -->
         <div class=" px-4 pb-0">
-            <button class="tab-btn" [class.active]="activeTab() === 'remisiones'" (click)="setTab('remisiones')">
-                <ng-icon name="lucideFileText" size="14" />
-                <span>Remisiones</span>
-                @if (totalElements() > 0 && activeTab() === 'remisiones') {
-                <span hlmBadge variant="secondary" class="tab-count">{{ totalElements() }}</span>
-                }
-            </button>
             <button class="tab-btn" [class.active]="activeTab() === 'pedidos'" (click)="setTab('pedidos')">
                 <ng-icon name="lucideShoppingCart" size="14" />
                 <span>Pedidos</span>
                 @if (pedidosTotalElements() > 0 && activeTab() === 'pedidos') {
                 <span hlmBadge variant="secondary" class="tab-count">{{ pedidosTotalElements() }}</span>
+                }
+            </button>
+            <button class="tab-btn" [class.active]="activeTab() === 'remisiones'" (click)="setTab('remisiones')">
+                <ng-icon name="lucideFileText" size="14" />
+                <span>Remisiones</span>
+                @if (totalElements() > 0 && activeTab() === 'remisiones') {
+                <span hlmBadge variant="secondary" class="tab-count">{{ totalElements() }}</span>
                 }
             </button>
         </div>

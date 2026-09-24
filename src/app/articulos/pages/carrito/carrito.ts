@@ -25,6 +25,7 @@ import { GenerarDocumentoRequest } from '../../../documentos/interfaces/document
 import { PricingService } from '../../../shared/services/pricing.service';
 import { firstValueFrom } from 'rxjs';
 import { ConfiguracionService } from '../../../shared/services/configuracion.service';
+import { toast } from '@spartan-ng/brain/sonner';
 
 @Component({
     selector: 'app-carrito',
@@ -134,7 +135,6 @@ export class Carrito {
     }
 
     protected async incrementar(item: CarritoItem): Promise<void> {
-        console.log(item);
         const updated = { ...item, cantidad: item.cantidad + 1 };
         this.items.update((list) =>
             list.map((i) => (i.articuloClave === item.articuloClave ? updated : i)),
@@ -219,21 +219,22 @@ export class Carrito {
                 descuento3: item.descuento3 || 0
             }))
         };
-        console.log('Generando documento online con request:', request);
         this.documentosService.generarDocumento(request).subscribe({
             next: async (response) => {
                 if (response.success) {
-                    console.log('Pedido generado exitosamente:', response);
                     await this.carritoDB.limpiarCarrito(agenteId, clienteId);
                     this.items.set([]);
+                    toast.success('Pedido generado exitosamente');
                     this.volver(); 
                 } else {
                     console.error('La API retornó error:', response.mensaje);
+                    toast.error(response.mensaje || 'Error al generar el pedido');
                 }
                 this.isSubmitted.set(false);
             },
             error: (err) => {
                 console.error('Error al generar el pedido online:', err);
+                toast.error('Error al generar el pedido online' + (err?.error?.mensaje ? `: ${err.error.mensaje}` : ''));
                 this.isSubmitted.set(false);
             }
         });
@@ -254,10 +255,9 @@ export class Carrito {
             tipoDocumento: this.configService.tipoDocumento(),
         };
 
-        console.log(documento);
-
         await this.documentosDB.guardarDocumento(documento);
         await this.carritoDB.limpiarCarrito(agenteId, clienteId);
+        toast.success('Documento guardado offline');
         this.isSubmitted.set(false);
         this.items.set([]);
         this.volver();

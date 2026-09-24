@@ -19,20 +19,8 @@ export class Clientes {
     private readonly clientesDB = inject(ClientesDB);
 
     constructor() {
-        // Escuchar cambios en la conectividad (isOnlineSubject)
-        this.conexion.isOnline$.subscribe(isOnline => {
-            if (isOnline) {
-                // Cuando estamos online, sincronizamos pendientes y luego recargamos la BD local
-                console.log('Conexión recuperada: sincronizando clientes pendientes...');
-                this.sincronizarClientesPendientes().then(() => {
-                    console.log('Clientes pendientes procesados. Sincronizando clientes hacia la BD local...');
-                    this.sincronizarClientesBackendToLocal().subscribe({
-                        next: () => console.log('Clientes sincronizados exitosamente en Dexie'),
-                        error: (err) => console.error('Error sincronizando clientes', err)
-                    });
-                });
-            }
-        });
+        // El sync (pendientes → backend, backend → local) lo gestiona SyncService
+        // en DashboardLayout, preservando el orden correcto de operaciones.
     }
 
     // ── Sync Backend → Local ──────────────────────────────────────────────────
@@ -57,14 +45,11 @@ export class Clientes {
         const pendientes = await this.clientesDB.getClientesPendientes();
         if (pendientes.length === 0) return;
 
-        console.log(`Sincronizando ${pendientes.length} clientes pendientes...`);
-
         for (const pendiente of pendientes) {
             const { _pendienteId, _intentos, ...clienteData } = pendiente;
             try {
                 await firstValueFrom(this.crearClienteEnServidor(clienteData));
                 await this.clientesDB.eliminarClientePendiente(_pendienteId);
-                console.log(`Cliente ${clienteData.clave} sincronizado exitosamente.`);
             } catch (err) {
                 await this.clientesDB.incrementarIntentosPendiente(_pendienteId);
                 console.error(`Error sincronizando cliente ${clienteData.clave} (intento ${_intentos + 1}):`, err);

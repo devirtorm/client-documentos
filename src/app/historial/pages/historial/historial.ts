@@ -21,6 +21,8 @@ import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs'
 import { AppHeaderComponent } from '../../../shared/components/app-header/app-header.component';
 import { LoadMoreButtonComponent } from '../../../shared/components/load-more-button/load-more-button.component';
 import { Conexion } from '../../../shared/services/conexion';
+import { ConfiguracionService } from '../../../shared/services/configuracion.service';
+import { toast } from '@spartan-ng/brain/sonner';
 
 type TabType = 'remisiones' | 'pedidos';
 
@@ -52,6 +54,7 @@ type TabType = 'remisiones' | 'pedidos';
 export class Historial implements OnDestroy {
     private remisionesService = inject(Remisiones);
     private pedidosService = inject(Pedidos);
+    private configService = inject(ConfiguracionService);
     protected conexionService = inject(Conexion);
 
     protected readonly activeTab = signal<TabType>('remisiones');
@@ -98,7 +101,17 @@ export class Historial implements OnDestroy {
     }
 
     ngOnInit(): void {
-        this.loadRemisiones();
+        const tab = this.configService.tipoDocumento() === 'P'
+            ? 'pedidos'
+            : 'remisiones';
+
+        this.setTab(tab);
+
+        if (tab === 'pedidos') {
+            this.loadPedidos();
+        } else {
+            this.loadRemisiones();
+        }
     }
 
     ngOnDestroy(): void {
@@ -126,7 +139,7 @@ export class Historial implements OnDestroy {
     protected loadRemisiones(): void {
         this.isLoading.set(true);
         const query = this.searchQuery();
-        this.remisionesService.getHistorialByAgente(0, 10, query).subscribe({
+        this.remisionesService.getHistorialByAgente(0, this.configService.itemsPorPagina(), query).subscribe({
             next: (page) => {
                 this.remisiones.set(page.content);
                 this.currentPage.set(page.page.number);
@@ -136,6 +149,7 @@ export class Historial implements OnDestroy {
             },
             error: () => {
                 this.isLoading.set(false);
+                toast.error('Error al cargar historial de remisiones');
             },
         });
     }
@@ -143,7 +157,7 @@ export class Historial implements OnDestroy {
     protected loadPedidos(): void {
         this.isLoading.set(true);
         const query = this.searchQuery();
-        this.pedidosService.getHistorialByAgente(0, 10, query).subscribe({
+        this.pedidosService.getHistorialByAgente(0, this.configService.itemsPorPagina(), query).subscribe({
             next: (page) => {
                 this.pedidos.set(page.content);
                 this.pedidosCurrentPage.set(page.page.number);
@@ -153,6 +167,7 @@ export class Historial implements OnDestroy {
             },
             error: () => {
                 this.isLoading.set(false);
+                toast.error('Error al cargar historial de pedidos');
             },
         });
     }
@@ -163,7 +178,7 @@ export class Historial implements OnDestroy {
         this.isLoadingMore.set(true);
         const nextPage = this.currentPage() + 1;
         const query = this.searchQuery();
-        this.remisionesService.getHistorialByAgente(nextPage, 10, query).subscribe({
+        this.remisionesService.getHistorialByAgente(nextPage, this.configService.itemsPorPagina(), query).subscribe({
             next: (page) => {
                 this.remisiones.update((current) => [...current, ...page.content]);
                 this.currentPage.set(page.page.number);
@@ -172,6 +187,7 @@ export class Historial implements OnDestroy {
             },
             error: () => {
                 this.isLoadingMore.set(false);
+                toast.error('Error al cargar más remisiones');
             },
         });
     }
@@ -182,7 +198,7 @@ export class Historial implements OnDestroy {
         this.isLoadingMore.set(true);
         const nextPage = this.pedidosCurrentPage() + 1;
         const query = this.searchQuery();
-        this.pedidosService.getHistorialByAgente(nextPage, 10, query).subscribe({
+        this.pedidosService.getHistorialByAgente(nextPage, this.configService.itemsPorPagina(), query).subscribe({
             next: (page) => {
                 this.pedidos.update((current) => [...current, ...page.content]);
                 this.pedidosCurrentPage.set(page.page.number);
@@ -191,6 +207,7 @@ export class Historial implements OnDestroy {
             },
             error: () => {
                 this.isLoadingMore.set(false);
+                toast.error('Error al cargar más pedidos');
             },
         });
     }

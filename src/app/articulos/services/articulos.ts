@@ -21,15 +21,8 @@ export class Articulos {
     private readonly pricingService = inject(PricingService);
 
     constructor() {
-        this.conexion.isOnline$.subscribe(isOnline => {
-            if (isOnline) {
-                console.log('Sincronizando artículos hacia la BD local...');
-                this.sincronizarArticulosBackendToLocal().subscribe({
-                    next: () => console.log('Artículos sincronizados exitosamente en Dexie'),
-                    error: (err) => console.error('Error sincronizando artículos', err)
-                });
-            }
-        });
+        // El sync hacia Dexie lo gestiona SyncService (en DashboardLayout),
+        // que se instancia siempre al autenticarse sin depender de la ruta activa.
     }
 
     sincronizarArticulosBackendToLocal(): Observable<void> {
@@ -58,13 +51,13 @@ export class Articulos {
         return this.http.get<Articulo[]>(`${this.apiUrl}/offline`, { params });
     }
 
-    getArticulos(page: number = 0, size: number = 10, search: string = ''): Observable<Page<Articulo>> {
-        return this.getAllArticulosByAlmacen(page, size, search);
+    getArticulos(page: number = 0, size: number = 10, search: string = '', sort: string = 'descripcion'): Observable<Page<Articulo>> {
+        return this.getAllArticulosByAlmacen(page, size, search, sort);
     }
 
-    getAllArticulos(page: number, size: number = 10, search: string = ''): Observable<Page<Articulo>> {
+    getAllArticulos(page: number, size: number = 10, search: string = '', sort: string = 'descripcion'): Observable<Page<Articulo>> {
         if (!this.conexion.isOnline) {
-            return from(this.articulosDB.getPagedArticulos(page, size, search)).pipe(
+            return from(this.articulosDB.getPagedArticulos(page, size, search, sort)).pipe(
                 switchMap(localPage => from(this.ajustarExistencias(localPage.content)).pipe(
                     map(adjusted => ({
                         content: adjusted,
@@ -77,7 +70,8 @@ export class Articulos {
         const params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString())
-            .set('search', search);
+            .set('search', search)
+            .set('sort', sort);
 
         return this.http.get<Page<Articulo>>(`${this.apiUrl}`, { params }).pipe(
             tap(pageRes => {
@@ -94,9 +88,9 @@ export class Articulos {
         );
     }
 
-    getAllArticulosByAlmacen(page: number, size: number = 10, search: string = ''): Observable<Page<Articulo>> {
+    getAllArticulosByAlmacen(page: number, size: number = 10, search: string = '', sort: string = 'descripcion'): Observable<Page<Articulo>> {
         if (!this.conexion.isOnline) {
-            return from(this.articulosDB.getPagedArticulos(page, size, search)).pipe(
+            return from(this.articulosDB.getPagedArticulos(page, size, search, sort)).pipe(
                 switchMap(localPage => from(this.ajustarExistencias(localPage.content)).pipe(
                     map(adjusted => ({
                         content: adjusted,
@@ -111,7 +105,8 @@ export class Articulos {
             .set('almacen', almacen)
             .set('page', page.toString())
             .set('size', size.toString())
-            .set('search', search);
+            .set('search', search)
+            .set('sort', sort);
 
         return this.http.get<Page<Articulo>>(`${this.apiUrl}/byAlmacen`, { params }).pipe(
             tap(pageRes => {

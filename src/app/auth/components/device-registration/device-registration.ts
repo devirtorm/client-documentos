@@ -7,6 +7,7 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { Auth } from '../../service/auth';
 import { LicenciasService } from '../../service/licencias.service';
+import { toast } from '@spartan-ng/brain/sonner';
 
 @Component({
   selector: 'app-device-registration',
@@ -52,7 +53,7 @@ export class DeviceRegistration {
     this.licenciasService.registrarDispositivo(payload)
       .subscribe({
         next: (res) => {
-          console.log('Licencia activada con éxito:', res);
+          toast.success('Licencia activada con éxito');
           localStorage.setItem('licenseToken', res.token);
           this.router.navigate(['/auth/login']);
         },
